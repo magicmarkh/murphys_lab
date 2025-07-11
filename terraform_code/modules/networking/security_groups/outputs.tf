@@ -70,11 +70,16 @@ output "sia_windows_target_sg_name" {
 }
 
 output "mysql_target_sg_id" {
-  description = "The name of the security group"
+  description = "The id of the security group"
   value = aws_security_group.mysql_target_sg.id
 }
 
 output "postgresql_target_sg_id" {
-  description = "The name of the security group"
+  description = "The id of the security group"
   value = aws_security_group.postgresql_target_sg.id
+}
+
+output "winrm_internal_flat_sg_id" {
+  description = "The id of the security group"
+  value = aws_security_group.winrm_internal_flat.id
 }

@@ -118,6 +118,36 @@ resource "aws_security_group" "rdp_internal_flat" {
   }
 }
 
+resource "aws_security_group" "winrm_internal_flat" {
+  name        = "${var.team_name}-internal-winrm-sg"
+  description = "Allow WINRM only from internal subnets"
+  vpc_id      = var.vpc_id
+
+  dynamic "ingress" {
+    for_each = var.internal_subnets
+    content {
+      description = "WINRM Terraform Port"
+      from_port   = 5985
+      to_port     = 5985
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name  = "${var.team_name}-internal-flat-winrm-sg"
+    Owner = var.asset_owner_name
+  }
+}
+
 resource "aws_security_group" "jenkins_8080" {
   name        = "${var.team_name}-jenkins-8080-sg"
   description = "8080"

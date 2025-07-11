@@ -186,3 +186,25 @@ module "postgresql" {
   vpc_security_group_ids = [module.security_groups.mysql_target_sg_id]
   team_name              = var.team_name
 }
+
+module "connector2" {
+  source = "./modules/infrastructure/ec2_instances/connector2"
+  iScheduler = var.iScheduler
+  windows_security_group_ids = [module.security_groups.rdp_internal_flat_sg_id,module.security_groups.winrm_internal_flat_sg_id]
+  domain_join_secret_arn = var.domain_join_secret_arn
+  iam_instance_profile = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  private_subnet_id = module.vpc.private_subnet_id
+  identity_secret_arn = var.cyberark_secret_arn
+  hostname = var.connector_2_hostname
+  identity_tenant_id             = var.identity_tenant_id
+  platform_tenant_name           = var.platform_tenant_name
+  region = var.region
+  windows_ami_id = var.amzn_windows_server_ami_id
+  team_name = var.team_name
+  asset_owner_name = var.asset_owner_name
+  key_name = module.key_pair.key_name
+  vpc_id = module.vpc.vpc_id
+  connector_pool_name = var.connector_pool_name
+  private_ip = var.connector_2_private_ip
+  domain_name = var.domain_name
+}

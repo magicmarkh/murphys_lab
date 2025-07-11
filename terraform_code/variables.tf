@@ -150,3 +150,23 @@ variable "linux_target_1_hostname" {
   description = "name of the target demo system for linux"
   type = string
 }
+
+variable "domain_join_secret_arn" {
+  description = "ARN of the secret stored in ASM for domain join operations"
+  type = string
+}
+
+variable "connector_2_private_ip" {
+  description = "private IP for connector 2"
+  type = string
+}
+
+variable "domain_name" {
+  description = "name of the domain to join connectors to"
+  type = string
+}
+
+variable "connector_2_hostname" {
+  description = "hostname of connector 2"
+  type = string
+}
