@@ -170,3 +170,13 @@ variable "connector_2_hostname" {
   description = "hostname of connector 2"
   type = string
 }
+
+variable "state_bucket" {
+  description = "bucket where terraform state file is stored"
+  type = string
+}
+
+variable "state_buckey_key" {
+  description = "key where the state file is stored"
+  type = string
+}
