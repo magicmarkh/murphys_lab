@@ -20,7 +20,7 @@ variable "ec2_asm_instance_profile_name" {}
 variable "linux_instance_type" {
   description = "instance type to be deployed"
   type = string
-  default = "t3a.micro"
+  default = "t3a.medium"
 }
 
 variable "windows_instance_type" {
