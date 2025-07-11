@@ -28,7 +28,7 @@ resource "aws_instance" "connector_2" {
   subnet_id                   = var.private_subnet_id
   associate_public_ip_address = false
   key_name                    = var.key_name
-  vpc_security_group_ids      = [var.windows_security_group_ids]
+  vpc_security_group_ids      = var.windows_security_group_ids
   iam_instance_profile        = var.iam_instance_profile
   private_ip                  = var.private_ip
   user_data                   = local.user_data
