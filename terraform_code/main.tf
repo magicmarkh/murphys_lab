@@ -186,7 +186,7 @@ module "postgresql" {
   vpc_security_group_ids = [module.security_groups.mysql_target_sg_id]
   team_name              = var.team_name
 }
-
+/*
 module "connector2" {
   source = "./modules/infrastructure/ec2_instances/connector2"
   iScheduler = var.iScheduler
@@ -207,4 +207,4 @@ module "connector2" {
   connector_pool_name = var.connector_pool_name
   private_ip = var.connector_2_private_ip
   domain_name = var.domain_name
-}
+}*/
