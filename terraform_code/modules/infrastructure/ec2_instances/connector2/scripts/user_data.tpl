@@ -13,10 +13,10 @@ Enable-PSRemoting -Force
 New-Item -ItemType Directory -Path "C:\Scripts"
 New-Item -ItemType Directory -Path "C:\Scripts\Logs"
 
-# Write out all scripts
-Set-Content -Path "C:\Scripts\rename_and_domain_join.ps1" -Value "${rename_join_script}"
-Set-Content -Path "C:\Scripts\register_connector.ps1" -Value "${register_script}"
-Set-Content -Path "C:\Scripts\init.ps1" -Value "${init_script}"
+# Decode and write scripts from base64
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${rename_join_script_b64}")) | Set-Content -Path "C:\Scripts\rename_and_domain_join.ps1"
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${register_script_b64}"))    | Set-Content -Path "C:\Scripts\register_connector.ps1"
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${init_script_b64}"))        | Set-Content -Path "C:\Scripts\init.ps1"
 
 # Register scheduled task to ensure init.ps1 runs at reboot
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1"
