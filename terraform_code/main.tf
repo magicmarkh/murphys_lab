@@ -52,7 +52,7 @@ module "ec2_public_server" {
   linux_security_group_ids   = module.security_groups.trusted_ssh_external_security_group_id
   windows_security_group_ids = module.security_groups.trusted_rdp_external_security_group_id
 }
-*/
+/*
 module "jenkins_server_role" {
   source           = "./modules/security/iam_roles/jenkins_server_role"
   team_name        = var.team_name
