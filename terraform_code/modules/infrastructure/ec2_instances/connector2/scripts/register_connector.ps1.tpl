@@ -11,7 +11,6 @@ Start-Transcript -Path "$logPath\$scriptName-$timestamp.log" -Append
 $Region               = "${region}"
 $SecretArn            = "${identity_secret_arn}"
 $PoolName             = "${connector_pool_name}"
-$CyberArkUrl          = "${cyberark_url}"
 $Identity_Tenant_Id   = "${identity_tenant_id}"
 $Platform_Tenant_Name = "${platform_tenant_name}"
 
