@@ -1,6 +1,7 @@
 resource "random_password" "local_admin_password" {
   length  = 24
   special = true
+  override_special = "!@#%^*()-_=+[]{}"
 }
 
 locals {
