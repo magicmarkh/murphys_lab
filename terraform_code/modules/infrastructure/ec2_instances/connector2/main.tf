@@ -5,20 +5,37 @@ resource "random_password" "local_admin_password" {
 }
 
 locals {
-  user_data = templatefile("${path.module}/scripts/user_data.tpl", {
+    rename_join_script = templatefile("${path.module}/scripts/rename_and_domain_join.ps1.tpl", {
     hostname                = var.hostname
     region                  = var.region
+    domain_join_secret_arn = var.domain_join_secret_arn
     domain_name             = var.domain_name
-    domain_join_secret_name = var.domain_join_secret_arn
-    identity_secret_arn     = var.identity_secret_arn
-    connector_pool_name     = var.connector_pool_name
+  })
+
+    register_script = templatefile("${path.module}/scripts/register_connector.ps1.tpl", {
+    region               = var.region
+    identity_secret_arn = var.identity_secret_arn
+    connector_pool_name = var.connector_pool_name
     identity_tenant_id      = var.identity_tenant_id
     platform_tenant_name    = var.platform_tenant_name
-    local_admin_password    = random_password.local_admin_password.result
+  })
 
-    init_script             = file("${path.module}/scripts/init.ps1")
-    register_script         = file("${path.module}/scripts/register_connector.ps1")
-    rename_join_script      = file("${path.module}/scripts/rename_and_domain_join.ps1")
+  init_script = file("${path.module}/scripts/init.ps1")
+  
+    user_data = templatefile("${path.module}/scripts/user_data.tpl", {
+    hostname              = var.hostname
+    region                = var.region
+    domain_name           = var.domain_name
+    domain_join_secret_arn = var.domain_join_secret_arn
+    identity_secret_arn   = var.identity_secret_arn
+    connector_pool_name   = var.connector_pool_name
+    identity_tenant_id    = var.identity_tenant_id
+    platform_tenant_name  = var.platform_tenant_name
+    local_admin_password  = random_password.local_admin_password.result
+
+    init_script           = local.init_script
+    register_script       = local.register_script
+    rename_join_script    = local.rename_join_script
   })
 }
 

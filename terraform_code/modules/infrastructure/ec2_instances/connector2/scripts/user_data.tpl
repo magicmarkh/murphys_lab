@@ -9,23 +9,14 @@ Set-Item WSMan:\localhost\Service\AllowUnencrypted -Value $true
 Set-Item WSMan:\localhost\Service\Auth\Basic -Value $true
 Enable-PSRemoting -Force
 
-# Create script directory and write out all scripts
+# Create script directory and logs
 New-Item -ItemType Directory -Path "C:\Scripts"
-
-# Create directory for logs
 New-Item -ItemType Directory -Path "C:\Scripts\Logs"
 
-Set-Content -Path "C:\Scripts\rename_and_domain_join.ps1" -Value @'
-${rename_join_script}
-'@
-
-Set-Content -Path "C:\Scripts\register_connector.ps1" -Value @'
-${register_script}
-'@
-
-Set-Content -Path "C:\Scripts\init.ps1" -Value @'
-${init_script}
-'@
+# Write out all scripts
+Set-Content -Path "C:\Scripts\rename_and_domain_join.ps1" -Value "${rename_join_script}"
+Set-Content -Path "C:\Scripts\register_connector.ps1" -Value "${register_script}"
+Set-Content -Path "C:\Scripts\init.ps1" -Value "${init_script}"
 
 # Register scheduled task to ensure init.ps1 runs at reboot
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1"
