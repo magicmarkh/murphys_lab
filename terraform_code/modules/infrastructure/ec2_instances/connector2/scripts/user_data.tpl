@@ -21,7 +21,8 @@ New-Item -ItemType Directory -Path "C:\Scripts\Logs"
 # Register scheduled task to ensure init.ps1 runs at reboot
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1"
 $trigger = New-ScheduledTaskTrigger -AtStartup
-Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "RunInitScript" -RunLevel Highest -Force
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+Register-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -TaskName "RunInitScript" -Force
 
 # Start init script now
 Start-Process powershell -ArgumentList "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1"
