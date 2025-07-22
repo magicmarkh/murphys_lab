@@ -12,6 +12,9 @@ Enable-PSRemoting -Force
 # Create script directory and write out all scripts
 New-Item -ItemType Directory -Path "C:\Scripts"
 
+# Create directory for logs
+New-Item -ItemType Directory -Path "C:\Scripts\Logs"
+
 Set-Content -Path "C:\Scripts\rename_and_domain_join.ps1" -Value @'
 ${rename_join_script}
 '@
