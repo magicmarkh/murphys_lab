@@ -8,13 +8,20 @@
   when: rename_result.reboot_required
 
 - name: Get domain credentials from AWS
-  community.aws.secretsmanager_secret:
-    secret_arn: "{{ domain_join_secret_arn }}"
-    region: "{{ aws_region }}"
-  delegate_to: localhost
+  hosts: localhost
   connection: local
-  run_once: true
-  register: domain_secret
+  gather_facts: false
+  tasks:
+    - name: Get domain credentials from AWS
+      community.aws.secretsmanager_secret:
+        secret_arn: "{{ domain_join_secret_arn }}"
+        region: "{{ aws_region }}"
+      register: domain_secret
+
+    - name: Set fact for domain credentials
+      set_fact:
+        domain_username: "{{ domain_secret.value.username }}"
+        domain_password: "{{ domain_secret.value.password }}"
 
 - name: Join domain
   win_domain_membership:
