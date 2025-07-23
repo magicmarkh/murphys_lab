@@ -8,9 +8,9 @@
   when: rename_result.reboot_required
 
 - name: Get domain credentials from AWS
-  hosts: localhost
   connection: local
-  gather_facts: false
+  delegate_to: localhost
+  run_once: true
   tasks:
     - name: Get domain credentials from AWS
       community.aws.secretsmanager_secret:
