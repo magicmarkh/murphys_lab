@@ -10,6 +10,23 @@ resource "aws_vpc" "main" {
   }
 }
 
+# DHCP Options Set with custom + AWS DNS
+resource "aws_vpc_dhcp_options" "custom_dns" {
+  domain_name         = var.domain_name
+  domain_name_servers = [var.dns_server_ip, "AmazonProvidedDNS"]
+
+  tags = {
+    Name  = "${var.team_name}-dhcp-options"
+    Owner = var.asset_owner_name
+  }
+}
+
+# Associate DHCP Options with VPC
+resource "aws_vpc_dhcp_options_association" "main" {
+  vpc_id          = aws_vpc.main.id
+  dhcp_options_id = aws_vpc_dhcp_options.custom_dns.id
+}
+
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
