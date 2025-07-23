@@ -11,7 +11,7 @@
   community.aws.secretsmanager_secret:
     secret_arn: "{{ domain_join_secret_arn }}"
     region: "{{ aws_region }}"
-  delegate_to: 127.0.0.1
+  delegate_to: localhost
   connection: local
   run_once: true
   register: domain_secret
