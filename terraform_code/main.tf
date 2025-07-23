@@ -10,6 +10,8 @@ module "vpc" {
   vpc_cidr            = var.vpc_cidr
   public_subnet_cidr  = var.public_subnet_cidr
   private_subnet_cidr = var.private_subnet_cidr
+  domain_name         = var.domain_name
+  dns_server_ip       = var.dc1_private_ip
 }
 
 module "s3_bucket" {
@@ -118,7 +120,7 @@ module "secrets_hub_onboarding_role" {
 
 module "ec2_asm_role" {
   source              = "./modules/security/iam_roles/ec2_asm_role"
-  cyberark_secret_arn = [var.cyberark_secret_arn,var.domain_join_secret_arn]
+  cyberark_secret_arn = [var.cyberark_secret_arn, var.domain_join_secret_arn]
 }
 
 module "aws_sia_conector" {
@@ -161,7 +163,7 @@ module "targets" {
   workspace_type                = var.workspace_type
   linux_target_1_hostname       = var.linux_target_1_hostname
   ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
-  windows_ami_id = var.amzn_windows_server_ami_id
+  windows_ami_id                = var.amzn_windows_server_ami_id
 }
 
 module "db_subnet_group" {
@@ -188,23 +190,23 @@ module "postgresql" {
 }
 
 module "connector2" {
-  source = "./modules/infrastructure/ec2_instances/connector2"
-  iScheduler = var.iScheduler
-  windows_security_group_ids = [module.security_groups.rdp_internal_flat_sg_id,module.security_groups.winrm_internal_flat_sg_id]
-  domain_join_secret_arn = var.domain_join_secret_arn
-  iam_instance_profile = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
-  private_subnet_id = module.vpc.private_subnet_id
-  identity_secret_arn = var.cyberark_secret_arn
-  hostname = var.connector_2_hostname
-  identity_tenant_id             = var.identity_tenant_id
-  platform_tenant_name           = var.platform_tenant_name
-  region = var.region
-  windows_ami_id = var.amzn_windows_server_ami_id
-  team_name = var.team_name
-  asset_owner_name = var.asset_owner_name
-  key_name = module.key_pair.key_name
-  vpc_id = module.vpc.vpc_id
-  connector_pool_name = var.connector_pool_name
-  private_ip = var.connector_2_private_ip
-  domain_name = var.domain_name
+  source                     = "./modules/infrastructure/ec2_instances/connector2"
+  iScheduler                 = var.iScheduler
+  windows_security_group_ids = [module.security_groups.rdp_internal_flat_sg_id, module.security_groups.winrm_internal_flat_sg_id]
+  domain_join_secret_arn     = var.domain_join_secret_arn
+  iam_instance_profile       = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  private_subnet_id          = module.vpc.private_subnet_id
+  identity_secret_arn        = var.cyberark_secret_arn
+  hostname                   = var.connector_2_hostname
+  identity_tenant_id         = var.identity_tenant_id
+  platform_tenant_name       = var.platform_tenant_name
+  region                     = var.region
+  windows_ami_id             = var.amzn_windows_server_ami_id
+  team_name                  = var.team_name
+  asset_owner_name           = var.asset_owner_name
+  key_name                   = module.key_pair.key_name
+  vpc_id                     = module.vpc.vpc_id
+  connector_pool_name        = var.connector_pool_name
+  private_ip                 = var.connector_2_private_ip
+  domain_name                = var.domain_name
 }
