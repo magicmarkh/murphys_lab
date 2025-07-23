@@ -14,7 +14,7 @@ data "aws_secretsmanager_secret_version" "domain_join_credentials" {
   secret_id = var.domain_join_secret_arn
 }
 
-data "aws_secretsmanager_secret_version" "identity_credentails" {
+data "aws_secretsmanager_secret_version" "identity_credentials" {
   secret_id = var.identity_secret_arn
 }
 
