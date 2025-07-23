@@ -8,7 +8,7 @@
   when: rename_result.reboot_required
 
 - name: Get domain credentials from AWS
-  amazon.aws.aws_secret:
+  community.aws.aws_secret:
     secret_arn: "{{ domain_join_secret_arn }}"
     region: "{{ aws_region }}"
   register: domain_secret
@@ -27,7 +27,7 @@
   when: domain_join.reboot_required
 
 - name: Get CyberArk credentials
-  amazon.aws.aws_secret:
+  community.aws.aws_secret:
     secret_arn: "{{ identity_secret_arn }}"
     region: "{{ aws_region }}"
   register: identity_secret
