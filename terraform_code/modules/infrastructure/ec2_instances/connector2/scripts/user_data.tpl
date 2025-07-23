@@ -20,10 +20,16 @@ New-Item -ItemType Directory -Path "C:\Scripts\Logs"
 
 # Register scheduled task to ensure init.ps1 runs at reboot
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1"
-$trigger = New-ScheduledTaskTrigger -AtStartup
+$trigger = New-ScheduledTaskTrigger -AtStartup -Delay "PT15S"
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 Register-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -TaskName "RunInitScript" -Force
 
-# Start init script now
-Start-Process powershell -ArgumentList "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1"
+# Start init script now and log output to a file
+try {
+  Start-Process powershell -ArgumentList "-ExecutionPolicy Bypass -File C:\Scripts\init.ps1" -Wait -NoNewWindow
+  "init.ps1 launched manually at $(Get-Date)" | Out-File -FilePath "C:\Scripts\Logs\init-manual-launch.txt"
+} catch {
+  "Manual init.ps1 launch failed: $_" | Out-File -FilePath "C:\Scripts\Logs\init-manual-launch-error.txt"
+}
+
 </powershell>
