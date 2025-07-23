@@ -46,6 +46,7 @@ resource "null_resource" "configure_connector" {
 
     provisioner "local-exec" {
     command = <<EOT
+    sleep 60 && \
 cd ../ansible && ansible-playbook \
   -i '${aws_instance.connector_2.private_ip},' \
   -e 'ansible_user=Administrator' \
