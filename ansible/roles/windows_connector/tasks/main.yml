@@ -1,0 +1,48 @@
+- name: Rename computer
+  win_hostname:
+    name: "{{ hostname }}"
+  register: rename_result
+
+- name: Reboot if hostname changed
+  win_reboot:
+  when: rename_result.reboot_required
+
+- name: Get domain credentials from AWS
+  amazon.aws.aws_secret:
+    secret_arn: "{{ domain_join_secret_arn }}"
+    region: "{{ aws_region }}"
+  register: domain_secret
+
+- name: Join domain
+  win_domain_membership:
+    dns_domain_name: "{{ domain_name }}"
+    hostname: "{{ hostname }}"
+    domain_admin_user: "{{ domain_secret.value.username }}"
+    domain_admin_password: "{{ domain_secret.value.password }}"
+    state: domain
+  register: domain_join
+
+- name: Reboot after domain join
+  win_reboot:
+  when: domain_join.reboot_required
+
+- name: Get CyberArk credentials
+  amazon.aws.aws_secret:
+    secret_arn: "{{ identity_secret_arn }}"
+    region: "{{ aws_region }}"
+  register: identity_secret
+
+- name: Register CyberArk connector
+  win_shell: |
+    $headers = @{
+      "Content-Type" = "application/json"
+      "Authorization" = "Bearer {{ identity_secret.value.token }}"
+    }
+
+    $body = @{
+      poolName = "{{ connector_pool_name }}"
+      tenantId = "{{ identity_tenant_id }}"
+      platformTenant = "{{ platform_tenant_name }}"
+    } | ConvertTo-Json
+
+    Invoke-RestMethod -Uri "https://your-cyberark-api/api/connectors/setup-script" -Headers $headers -Body $body -Method Post

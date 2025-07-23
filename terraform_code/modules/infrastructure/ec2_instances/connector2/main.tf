@@ -5,17 +5,8 @@ resource "random_password" "local_admin_password" {
 }
 
 locals {
-  register_script_b64 = base64encode(templatefile("${path.module}/scripts/register_connector.ps1.tpl", {
-    region               = var.region
-    identity_secret_arn  = var.identity_secret_arn
-    connector_pool_name  = var.connector_pool_name
-    identity_tenant_id   = var.identity_tenant_id
-    platform_tenant_name = var.platform_tenant_name
-  }))
-
   user_data = templatefile("${path.module}/scripts/user_data.tpl", {
     local_admin_password = random_password.local_admin_password.result
-    register_script_b64  = local.register_script_b64
   })
 }
 
@@ -44,9 +35,6 @@ resource "aws_instance" "connector_2" {
 }
 
 
-
-
-
 resource "null_resource" "configure_connector" {
   depends_on = [aws_instance.connector_2]
 
@@ -64,7 +52,7 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
   -e 'region=${var.region}' \
   -e 'domain_join_secret_arn=${var.domain_join_secret_arn}' \
   -e 'domain_name=${var.domain_name}' \
-  ${path.module}/scripts/configure_connector.yml
+  ${path.module}/../../../../../ansible/playbooks/onboard_windows_connector.yml
 EOT
   }
 }
