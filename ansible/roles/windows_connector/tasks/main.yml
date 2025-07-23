@@ -7,42 +7,18 @@
   win_reboot:
   when: rename_result.reboot_required
 
-- name: Get domain credentials from AWS
-  connection: local
-  delegate_to: localhost
-  run_once: true
-  tasks:
-    - name: Get domain credentials from AWS
-      community.aws.secretsmanager_secret:
-        secret_arn: "{{ domain_join_secret_arn }}"
-        region: "{{ aws_region }}"
-      register: domain_secret
-
-    - name: Set fact for domain credentials
-      set_fact:
-        domain_username: "{{ domain_secret.value.username }}"
-        domain_password: "{{ domain_secret.value.password }}"
-
 - name: Join domain
   win_domain_membership:
     dns_domain_name: "{{ domain_name }}"
     hostname: "{{ hostname }}"
-    domain_admin_user: "{{ domain_secret.value.username }}"
-    domain_admin_password: "{{ domain_secret.value.password }}"
+    domain_admin_user: "{{ domain_join_username }}"
+    domain_admin_password: "{{ domain_join_password }}"
     state: domain
   register: domain_join
 
 - name: Reboot after domain join
   win_reboot:
   when: domain_join.reboot_required
-
-- name: Get CyberArk credentials
-  community.aws.secretsmanager_secret:
-    secret_arn: "{{ identity_secret_arn }}"
-    region: "{{ aws_region }}"
-  delegate_to: localhost
-  run_once: true
-  register: identity_secret
 
 - name: Register CyberArk connector
   win_shell: |

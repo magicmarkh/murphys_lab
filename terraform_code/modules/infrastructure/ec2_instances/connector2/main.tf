@@ -10,7 +10,13 @@ locals {
   })
 }
 
+data "aws_secretsmanager_secret_version" "domain_join_credentials" {
+  secret_id = var.domain_join_secret_arn
+}
 
+data "aws_secretsmanager_secret_version" "identity_credentails" {
+  secret_id = var.identity_secret_arn
+}
 
 resource "aws_instance" "connector_2" {
   ami                         = var.windows_ami_id
@@ -50,7 +56,10 @@ cd ../ansible && ansible-playbook \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'hostname=${var.hostname}' \
   -e 'region=${var.region}' \
-  -e 'domain_join_secret_arn=${var.domain_join_secret_arn}' \
+  -e 'domain_join_username=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["username"]}' \
+  -e 'domain_join_password=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["password"]}' \
+  -e 'identity_username=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["username"]}' \
+  -e 'identity_password=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["password"]}' \
   -e 'domain_name=${var.domain_name}' \
   playbooks/onboard_windows_connector.yml
 EOT
