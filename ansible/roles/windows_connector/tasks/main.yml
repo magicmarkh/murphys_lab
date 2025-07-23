@@ -11,6 +11,7 @@
   community.aws.secretsmanager_secret:
     secret_arn: "{{ domain_join_secret_arn }}"
     region: "{{ aws_region }}"
+  delegate_to: localhost
   register: domain_secret
 
 - name: Join domain
@@ -30,6 +31,7 @@
   community.aws.secretsmanager_secret:
     secret_arn: "{{ identity_secret_arn }}"
     region: "{{ aws_region }}"
+  delegate_to: localhost
   register: identity_secret
 
 - name: Register CyberArk connector
