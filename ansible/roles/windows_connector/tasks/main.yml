@@ -22,15 +22,70 @@
 
 - name: Register CyberArk connector
   win_shell: |
-    $headers = @{
-      "Content-Type" = "application/json"
-      "Authorization" = "Bearer {{ identity_secret.value.token }}"
+    $ErrorActionPreference = "Stop"
+    
+    New-Item -Path "C:\logs\sia" -ItemType Directory
+    $log = "C:\logs\sia_register.log"
+    $flag = "C:\logs\sia_register_done"
+
+    if (Test-Path $flag) {
+      Add-Content -Path $log -Value "[register] Registration already completed; skipping."
+      exit 0
     }
 
-    $body = @{
-      poolName = "{{ connector_pool_name }}"
-      tenantId = "{{ identity_tenant_id }}"
-      platformTenant = "{{ platform_tenant_name }}"
-    } | ConvertTo-Json
+    "[$(Get-Date)] [register] Starting connector registration" | Out-File $log -Append
 
-    Invoke-RestMethod -Uri "https://your-cyberark-api/api/connectors/setup-script" -Headers $headers -Body $body -Method Post
+    # Fetch platform credentials from Secrets Manager (already passed in as variables)
+    $clientId     = "{{ identity_username }}"
+    $clientSecret = "{{ identity_password }}"
+
+    $identityUrl         = "https://{{ identity_tenant_id }}.id.cyberark.cloud"
+    $platformTokenUrl    = "$identityUrl/oauth2/platformtoken"
+    $cmDomain            = "{{ platform_tenant_name }}.connectormanagement.cyberark.cloud"
+    $jitApiUrl           = "https://{{ platform_tenant_name }}-jit.cyberark.cloud/api/connectors/setup-script"
+
+    # Request platform token
+    "[$(Get-Date)] [register] Requesting OAuth token" | Out-File $log -Append
+    $tokenResponse = Invoke-RestMethod -Uri $platformTokenUrl -Method Post -Form @{
+      grant_type    = "client_credentials"
+      client_id     = $clientId
+      client_secret = $clientSecret
+    } -ContentType "multipart/form-data"
+
+    $platformToken = $tokenResponse.access_token
+    if (-not $platformToken) {
+      "[$(Get-Date)] [register] ERROR: Failed to obtain platform token" | Out-File $log -Append
+      exit 1
+    }
+
+    # Get connector pool ID
+    $pools = Invoke-RestMethod -Uri "https://$cmDomain/api/connector-pools" -Headers @{ Authorization = "Bearer $platformToken" }
+    $poolId = ($pools.connectorPools | Where-Object { $_.name -eq "{{ connector_pool_name }}" }).poolId
+    if (-not $poolId) {
+      "[$(Get-Date)] [register] ERROR: Pool ID not found" | Out-File $log -Append
+      exit 2
+    }
+
+    # Request setup script
+    $setupResp = Invoke-RestMethod -Uri $jitApiUrl -Method Post -Headers @{ Authorization = "Bearer $platformToken" } -Body (@{
+      connector_type     = "AWS"
+      connector_os       = "windows"
+      connector_pool_id  = $poolId
+      expiration_minutes = 15
+    } | ConvertTo-Json -Depth 3)
+
+    $psCommand = $setupResp.powershell_cmd
+    if (-not $psCommand) {
+      "[$(Get-Date)] [register] ERROR: Setup script not received" | Out-File $log -Append
+      exit 3
+    }
+
+    "[$(Get-Date)] [register] Executing setup script" | Out-File $log -Append
+    Invoke-Expression $psCommand
+
+    # Invalidate token
+    Invoke-RestMethod -Uri "$identityUrl/security/logout" -Method Post -Headers @{ Authorization = "Bearer $platformToken" }
+
+    "[$(Get-Date)] [register] Registration complete" | Out-File $log -Append
+    New-Item -Path $flag -ItemType File
+  register: register_result

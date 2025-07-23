@@ -61,6 +61,8 @@ cd ../ansible && ansible-playbook \
   -e 'identity_username=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["username"]}' \
   -e 'identity_password=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["password"]}' \
   -e 'domain_name=${var.domain_name}' \
+  -e 'identity_tenant_id=${var.identity_tenant_id}' \
+  -e 'platform_tenant_name=${var.platform_tenant_name}' \
   playbooks/onboard_windows_connector.yml
 EOT
   }
