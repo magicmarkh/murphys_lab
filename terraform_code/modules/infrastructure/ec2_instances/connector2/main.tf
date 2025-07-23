@@ -56,9 +56,9 @@ cd ../ansible && ansible-playbook \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'hostname=${var.hostname}' \
   -e 'aws_region=${var.region}' \
-  -e 'domain_join_username=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["username"]}' \
+  -e 'domain_join_username=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["username"]}@murphyslab.local' \
   -e 'domain_join_password=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["password"]}' \
-  -e 'identity_username=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["username"]}' \
+  -e 'identity_username=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["username"]}@murphys.cloud' \
   -e 'identity_password=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["password"]}' \
   -e 'domain_name=${var.domain_name}' \
   -e 'identity_tenant_id=${var.identity_tenant_id}' \
