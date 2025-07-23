@@ -95,7 +95,7 @@
 
     "[$(Get-Date)] [register] Raw setup API response:`n$($setupResp | ConvertTo-Json -Depth 4)" | Out-File $log -Append
 
-    $psCommand = $setupResp.powershell_cmd
+    $psCommand = $setupResp.bash_cmd
     if ([string]::IsNullOrWhiteSpace($psCommand)) {
       "[$(Get-Date)] [register] ERROR: Setup script not received" | Out-File $log -Append
       exit 3
