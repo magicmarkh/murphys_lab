@@ -38,9 +38,9 @@ resource "aws_instance" "connector_2" {
 resource "null_resource" "configure_connector" {
   depends_on = [aws_instance.connector_2]
 
-  provisioner "local-exec" {
+    provisioner "local-exec" {
     command = <<EOT
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+cd ../ansible && ansible-playbook \
   -i '${aws_instance.connector_2.private_ip},' \
   -e 'ansible_user=Administrator' \
   -e 'ansible_password=${random_password.local_admin_password.result}' \
@@ -52,7 +52,7 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
   -e 'region=${var.region}' \
   -e 'domain_join_secret_arn=${var.domain_join_secret_arn}' \
   -e 'domain_name=${var.domain_name}' \
-  ../ansible/playbooks/onboard_windows_connector.yml
+  playbooks/onboard_windows_connector.yml
 EOT
   }
 }
