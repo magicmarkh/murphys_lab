@@ -5,13 +5,6 @@ resource "random_password" "local_admin_password" {
 }
 
 locals {
-  rename_join_script_b64 = base64encode(templatefile("${path.module}/scripts/rename_and_domain_join.ps1.tpl", {
-    hostname               = var.hostname
-    region                 = var.region
-    domain_join_secret_arn = var.domain_join_secret_arn
-    domain_name            = var.domain_name
-  }))
-
   register_script_b64 = base64encode(templatefile("${path.module}/scripts/register_connector.ps1.tpl", {
     region               = var.region
     identity_secret_arn  = var.identity_secret_arn
@@ -20,13 +13,9 @@ locals {
     platform_tenant_name = var.platform_tenant_name
   }))
 
-  init_script_b64 = base64encode(file("${path.module}/scripts/init.ps1"))
-
   user_data = templatefile("${path.module}/scripts/user_data.tpl", {
-    local_admin_password   = random_password.local_admin_password.result
-    rename_join_script_b64 = local.rename_join_script_b64
-    register_script_b64    = local.register_script_b64
-    init_script_b64        = local.init_script_b64
+    local_admin_password = random_password.local_admin_password.result
+    register_script_b64  = local.register_script_b64
   })
 }
 
@@ -57,3 +46,25 @@ resource "aws_instance" "connector_2" {
 
 
 
+
+resource "null_resource" "configure_connector" {
+  depends_on = [aws_instance.connector_2]
+
+  provisioner "local-exec" {
+    command = <<EOT
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+  -i '${aws_instance.connector_2.private_ip},' \
+  -e 'ansible_user=Administrator' \
+  -e 'ansible_password=${random_password.local_admin_password.result}' \
+  -e 'ansible_connection=winrm' \
+  -e 'ansible_port=5985' \
+  -e 'ansible_winrm_scheme=http' \
+  -e 'ansible_winrm_server_cert_validation=ignore' \
+  -e 'hostname=${var.hostname}' \
+  -e 'region=${var.region}' \
+  -e 'domain_join_secret_arn=${var.domain_join_secret_arn}' \
+  -e 'domain_name=${var.domain_name}' \
+  ${path.module}/scripts/configure_connector.yml
+EOT
+  }
+}
