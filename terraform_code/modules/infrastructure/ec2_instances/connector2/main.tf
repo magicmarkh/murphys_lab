@@ -52,7 +52,7 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
   -e 'region=${var.region}' \
   -e 'domain_join_secret_arn=${var.domain_join_secret_arn}' \
   -e 'domain_name=${var.domain_name}' \
-  ${path.module}/../../../../../ansible/playbooks/onboard_windows_connector.yml
+  ../ansible/playbooks/onboard_windows_connector.yml
 EOT
   }
 }
