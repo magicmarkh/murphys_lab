@@ -63,6 +63,7 @@ cd ../ansible && ansible-playbook \
   -e 'domain_name=${var.domain_name}' \
   -e 'identity_tenant_id=${var.identity_tenant_id}' \
   -e 'platform_tenant_name=${var.platform_tenant_name}' \
+  -e 'connector_pool_name=${var.connector_pool_name}' \
   playbooks/onboard_windows_connector.yml
 EOT
   }
