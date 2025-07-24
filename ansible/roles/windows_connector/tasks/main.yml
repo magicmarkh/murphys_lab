@@ -1,3 +1,8 @@
+- name: Wait for WinRM to be ready
+  wait_for_connection:
+    timeout: 300
+    delay: 15
+
 - name: Rename computer
   win_hostname:
     name: "{{ hostname }}"

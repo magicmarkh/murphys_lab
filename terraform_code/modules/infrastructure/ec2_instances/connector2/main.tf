@@ -34,7 +34,7 @@ resource "aws_instance" "connector_2" {
     http_endpoint = "enabled"
   }
   tags = {
-    Name          = var.hostname
+    Name          = "${var.team_name}-${var.hostname}"
     Owner         = var.asset_owner_name
     CA_iScheduler = var.iScheduler
   }
@@ -46,7 +46,6 @@ resource "null_resource" "configure_connector" {
 
     provisioner "local-exec" {
     command = <<EOT
-    sleep 60 && \
 cd ../ansible && ansible-playbook \
   -i '${aws_instance.connector_2.private_ip},' \
   -e 'ansible_user=Administrator' \
@@ -56,7 +55,6 @@ cd ../ansible && ansible-playbook \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'hostname=${var.hostname}' \
-  -e 'aws_region=${var.region}' \
   -e 'domain_join_username=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["username"]}@murphyslab.local' \
   -e 'domain_join_password=${jsondecode(data.aws_secretsmanager_secret_version.domain_join_credentials.secret_string)["password"]}' \
   -e 'identity_username=${jsondecode(data.aws_secretsmanager_secret_version.identity_credentials.secret_string)["username"]}@murphys.cloud' \
