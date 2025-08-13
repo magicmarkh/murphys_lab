@@ -165,7 +165,7 @@ module "targets" {
   ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
   windows_ami_id                = var.amzn_windows_server_ami_id
 }
-
+/*
 module "db_subnet_group" {
   source             = "./modules/networking/db_subnet_group"
   team_name          = var.team_name
@@ -210,3 +210,4 @@ module "connector2" {
   private_ip                 = var.connector_2_private_ip
   domain_name                = var.domain_name
 }
+*/
