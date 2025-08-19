@@ -1,6 +1,7 @@
 resource "random_password" "mysql_admin_password" {
   length  = 16
   special = true
+  override_special = "/,@,\""
 }
 
 data "aws_rds_engine_version" "mysql_latest" {

@@ -165,7 +165,7 @@ module "targets" {
   ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
   windows_ami_id                = var.amzn_windows_server_ami_id
 }
-/*
+
 module "db_subnet_group" {
   source             = "./modules/networking/db_subnet_group"
   team_name          = var.team_name
@@ -185,10 +185,10 @@ module "postgresql" {
   iScheduler             = var.iScheduler
   db_subnet_group_name   = module.db_subnet_group.db_subnet_group_name
   asset_owner_name       = var.asset_owner_name
-  vpc_security_group_ids = [module.security_groups.mysql_target_sg_id]
+  vpc_security_group_ids = [module.security_groups.postgresql_target_sg_id]
   team_name              = var.team_name
 }
-
+/*
 module "connector2" {
   source                     = "./modules/infrastructure/ec2_instances/connector2"
   iScheduler                 = var.iScheduler
