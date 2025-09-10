@@ -170,3 +170,15 @@ variable "connector_2_hostname" {
   description = "hostname of connector 2"
   type = string
 }
+
+variable "enable_mssql_domain_join" {
+  description = "Enable domain join for MSSQL RDS instance"
+  type        = bool
+  default     = true
+}
+
+variable "mssql_domain_ou" {
+  description = "Organizational Unit (OU) in AD for RDS MSSQL (optional)"
+  type        = string
+  default     = null
+}

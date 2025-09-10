@@ -188,6 +188,15 @@ module "postgresql" {
   vpc_security_group_ids = [module.security_groups.postgresql_target_sg_id]
   team_name              = var.team_name
 }
+
+module "mssql" {
+  source                 = "./modules/infrastructure/rds/mssql"
+  iScheduler             = var.iScheduler
+  db_subnet_group_name   = module.db_subnet_group.db_subnet_group_name
+  asset_owner_name       = var.asset_owner_name
+  vpc_security_group_ids = [module.security_groups.mssql_target_sg_id]
+}
+
 /*
 module "connector2" {
   source                     = "./modules/infrastructure/ec2_instances/connector2"

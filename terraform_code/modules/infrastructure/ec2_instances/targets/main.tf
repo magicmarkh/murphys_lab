@@ -45,10 +45,14 @@ resource "aws_instance" "linux_target_1" {
     Owner = var.asset_owner_name
     CA_iScheduler = var.iScheduler
   }
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 
-resource "aws_instance" "public_windows_server" {
+resource "aws_instance" "target_windows_server" {
   ami                         = var.windows_ami_id
   instance_type               = var.windows_instance_type
   subnet_id                   = var.private_subnet_id
@@ -61,5 +65,9 @@ resource "aws_instance" "public_windows_server" {
     Name  = "${var.team_name}-windows-target-1"
     Owner = var.asset_owner_name
     CA_iScheduler = var.iScheduler
+  }
+
+  lifecycle {
+    ignore_changes = [ tags ]
   }
 }

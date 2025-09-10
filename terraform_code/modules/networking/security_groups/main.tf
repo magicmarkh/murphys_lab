@@ -385,3 +385,30 @@ resource "aws_security_group" "postgresql_target_sg" {
     Name        = "${var.team_name}-postgresql-sg"
   }
 }
+
+# Add this to the security groups main.tf file
+
+resource "aws_security_group" "mssql_target_sg" {
+  name        = "${var.team_name}-mssql-sg"
+  description = "Allow MSSQL from private subnets only"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description = "MSSQL access from private subnets"
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    cidr_blocks = [var.private_subnet_cidr]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.team_name}-mssql-sg"
+  }
+}

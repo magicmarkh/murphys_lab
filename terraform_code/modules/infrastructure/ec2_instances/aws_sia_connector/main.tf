@@ -42,4 +42,8 @@ resource "aws_instance" "sia_aws_connector" {
     Owner          = var.asset_owner_name
     CA_iScheduler  = var.iScheduler
   }
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }

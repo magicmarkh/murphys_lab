@@ -12,4 +12,8 @@ resource "aws_instance" "connector_1" {
     Owner = var.asset_owner_name
     CA_iScheduler = var.iScheduler
   }
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
