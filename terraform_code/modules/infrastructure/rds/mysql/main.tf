@@ -27,7 +27,8 @@ resource "aws_db_instance" "mysql" {
 
    tags = {
     Name  = "${var.identifier}"
-    Owner = var.asset_owner_name
+    I_Owner = var.asset_owner_name
+    I_Purpose = "Murphy's Lab MySQL Target"
     CA_iScheduler = var.iScheduler
   }
 }

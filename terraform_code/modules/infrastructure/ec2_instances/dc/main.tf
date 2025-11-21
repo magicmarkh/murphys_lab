@@ -9,7 +9,8 @@ resource "aws_instance" "us-ent-east-dc1" {
 
   tags = {
     Name  = "${var.team_name}-dc1"
-    Owner = var.asset_owner_name
+    I_Owner = var.asset_owner_name
+    I_Purpose = "Murphy's Lab Domain Controller"
     CA_iScheduler = var.iScheduler
   }
 

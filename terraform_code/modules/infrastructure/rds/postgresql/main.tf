@@ -26,7 +26,8 @@ resource "aws_db_instance" "postgresql" {
 
     tags = {
     Name  = "${var.team_name}-postgresql"
-    Owner = var.asset_owner_name
+    I_Owner = var.asset_owner_name
+    I_Purpose = "Murphy's Lab PostgreSql Target"
     CA_iScheduler = var.iScheduler
   }
 }

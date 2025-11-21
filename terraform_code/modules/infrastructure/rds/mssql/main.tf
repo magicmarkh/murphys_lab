@@ -31,7 +31,8 @@ resource "aws_db_instance" "mssql" {
 
   tags = {
     Name          = "${var.identifier}"
-    Owner         = var.asset_owner_name
+    I_Owner         = var.asset_owner_name
+    I_Purpose     = "Murphy's Lab MSSQL Target"
     CA_iScheduler = var.iScheduler
   }
 }

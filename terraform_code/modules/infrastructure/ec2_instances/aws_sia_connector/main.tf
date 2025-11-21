@@ -39,7 +39,8 @@ resource "aws_instance" "sia_aws_connector" {
 
   tags = {
     Name           = "${var.team_name}-aws-sia-connector-1"
-    Owner          = var.asset_owner_name
+    I_Owner        = var.asset_owner_name
+    I_Purpose      = "Murphy's Lab SIA Connector"
     CA_iScheduler  = var.iScheduler
   }
 

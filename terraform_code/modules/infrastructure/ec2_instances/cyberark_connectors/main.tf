@@ -9,7 +9,8 @@ resource "aws_instance" "connector_1" {
 
   tags = {
     Name  = "${var.team_name}-connector-1"
-    Owner = var.asset_owner_name
+    I_Owner = var.asset_owner_name
+    I_Purpose     = "Murphy's Lab primary CyberArk Connector"
     CA_iScheduler = var.iScheduler
   }
 

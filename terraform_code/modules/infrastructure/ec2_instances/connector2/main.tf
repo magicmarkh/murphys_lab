@@ -35,7 +35,8 @@ resource "aws_instance" "connector_2" {
   }
   tags = {
     Name          = "${var.team_name}-${var.hostname}"
-    Owner         = var.asset_owner_name
+    I_Owner       = var.asset_owner_name
+    I_Purpose     = "Murphy's Lab Windows connector - automated example"
     CA_iScheduler = var.iScheduler
   }
 }
