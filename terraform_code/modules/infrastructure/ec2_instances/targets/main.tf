@@ -43,7 +43,7 @@ resource "aws_instance" "linux_target_1" {
   tags = {
     Name  = "${var.team_name}-linux-target-1"
     I_Owner = var.asset_owner_name
-    I_Purpose = "Murphy's Lab Linux Target System"
+    I_Purpose = "Murphys Lab Linux Target System"
     CA_iScheduler = var.iScheduler
   }
 
@@ -65,7 +65,7 @@ resource "aws_instance" "target_windows_server" {
   tags = {
     Name  = "${var.team_name}-windows-target-1"
     I_Owner = var.asset_owner_name
-    I_Purpose = "Murphy's Lab Windows Target"
+    I_Purpose = "Murphys Lab Windows Target"
     CA_iScheduler = var.iScheduler
   }
 

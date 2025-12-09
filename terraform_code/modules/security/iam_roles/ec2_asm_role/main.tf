@@ -16,7 +16,11 @@ resource "aws_iam_role" "ec2_asm_role" {
 
 data "aws_iam_policy_document" "secrets" {
   statement {
-    actions   = ["secretsmanager:GetSecretValue"]
+    actions   = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:DescribeSecret"
+      ]
     resources = var.cyberark_secret_arn
   }
 }

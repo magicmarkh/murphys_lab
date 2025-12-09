@@ -120,7 +120,7 @@ module "secrets_hub_onboarding_role" {
 
 module "ec2_asm_role" {
   source              = "./modules/security/iam_roles/ec2_asm_role"
-  cyberark_secret_arn = [var.cyberark_secret_arn, var.domain_join_secret_arn]
+  cyberark_secret_arn = [var.mssql_domain_join_arn]
 }
 
 module "aws_sia_conector" {
@@ -195,6 +195,8 @@ module "mssql" {
   db_subnet_group_name   = module.db_subnet_group.db_subnet_group_name
   asset_owner_name       = var.asset_owner_name
   vpc_security_group_ids = [module.security_groups.mssql_target_sg_id]
+  domain_auth_secret_arn = var.mssql_domain_join_arn
+  domain_ou              = var.mssql_domain_ou
 }
 
 /*

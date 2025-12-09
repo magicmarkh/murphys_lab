@@ -18,6 +18,9 @@ resource "aws_db_instance" "mssql" {
   password               = random_password.mssql_admin_password.result
   db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = var.vpc_security_group_ids
+  domain_auth_secret_arn = var.domain_auth_secret_arn
+  domain_dns_ips         = var.domain_dns_ips
+  domain_ou              = var.domain_ou
 
   publicly_accessible     = var.publicly_accessible
   multi_az                = false
@@ -32,7 +35,7 @@ resource "aws_db_instance" "mssql" {
   tags = {
     Name          = "${var.identifier}"
     I_Owner         = var.asset_owner_name
-    I_Purpose     = "Murphy's Lab MSSQL Target"
+    I_Purpose     = "Murphys Lab MSSQL Target"
     CA_iScheduler = var.iScheduler
   }
 }

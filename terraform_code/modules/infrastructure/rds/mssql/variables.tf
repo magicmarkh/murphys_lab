@@ -10,7 +10,7 @@ variable "identifier" {
 variable "instance_class" {
   description = "Instance type - db.t3.micro is cheapest for SQL Server Express"
   type        = string
-  default     = "db.t3.micro"
+  default     = "db.t3.small"
 }
 
 variable "allocated_storage" {
@@ -51,4 +51,20 @@ variable "backup_retention" {
   description = "Backup retention period in days"
   type        = number
   default     = 1
+}
+
+variable "domain_auth_secret_arn" {
+  description = "ARN of the secret in AWS Secrets Manager for joining the MSSQL instance to local Active Directory"
+  type = string
+}
+
+variable "domain_dns_ips" {
+  description = "List of DNS IP addresses for the domain"
+  type        = list(string)
+  default     = ["192.168.20.10", "192.168.20.10"]
+}
+
+variable "domain_ou" {
+  description = "OU where the MSSQL DB is to be joined to"
+  type        = string
 }

@@ -177,8 +177,15 @@ variable "enable_mssql_domain_join" {
   default     = true
 }
 
+variable "mssql_domain_join_arn" {
+  description = "arn for mssql service account"
+  type        = string
+  default     = null
+}
+
 variable "mssql_domain_ou" {
   description = "Organizational Unit (OU) in AD for RDS MSSQL (optional)"
   type        = string
   default     = null
 }
+

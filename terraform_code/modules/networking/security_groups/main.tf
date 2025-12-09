@@ -256,6 +256,13 @@ locals {
       to_port     = 464
       protocol    = "tcp"
       name        = "Kerberos Password Change"
+    },
+    {
+      description = "LDAPS from internal network"
+      from_port   = 636
+      to_port     = 636
+      protocol    = "tcp"
+      name        = "LDAPS"
     }
   ]
 }
