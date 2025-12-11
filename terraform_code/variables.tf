@@ -1,6 +1,5 @@
 variable "asset_owner_name" {
   description = "Name of the human that the cloud team can contact with questions"
-  default = "Mark Hurter"
   type = string
 }
 
