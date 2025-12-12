@@ -29,5 +29,6 @@ resource "aws_db_instance" "postgresql" {
     I_Owner = var.asset_owner_name
     I_Purpose = "Murphys Lab PostgreSql Target"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 }

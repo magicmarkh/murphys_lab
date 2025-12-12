@@ -12,6 +12,7 @@ resource "aws_instance" "connector_1" {
     I_Owner = var.asset_owner_name
     I_Purpose     = "Murphy's Lab primary CyberArk Connector"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 
   lifecycle {

@@ -45,6 +45,7 @@ resource "aws_instance" "linux_target_1" {
     I_Owner = var.asset_owner_name
     I_Purpose = "Murphys Lab Linux Target System"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 
   lifecycle {
@@ -67,6 +68,7 @@ resource "aws_instance" "target_windows_server" {
     I_Owner = var.asset_owner_name
     I_Purpose = "Murphys Lab Windows Target"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 
   lifecycle {

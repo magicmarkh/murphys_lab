@@ -12,6 +12,7 @@ resource "aws_instance" "us-ent-east-dc1" {
     I_Owner = var.asset_owner_name
     I_Purpose = "Murphy's Lab Domain Controller"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 
   lifecycle {

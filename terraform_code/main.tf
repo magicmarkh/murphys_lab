@@ -120,7 +120,7 @@ module "secrets_hub_onboarding_role" {
 
 module "ec2_asm_role" {
   source              = "./modules/security/iam_roles/ec2_asm_role"
-  cyberark_secret_arn = [var.mssql_domain_join_arn]
+  cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
 module "aws_sia_conector" {
@@ -164,6 +164,28 @@ module "targets" {
   linux_target_1_hostname       = var.linux_target_1_hostname
   ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
   windows_ami_id                = var.amzn_windows_server_ami_id
+}
+
+module "sca_mcp_server" {
+  source                        = "./modules/infrastructure/ec2_instances/sca_mcp_server"
+  vpc_id                        = module.vpc.vpc_id
+  team_name                     = var.team_name
+  asset_owner_name              = var.asset_owner_name
+  key_name                      = module.key_pair.key_name
+  iScheduler                    = var.iScheduler
+  ami_id                        = var.amzn_linux_ami_id
+  vpc_security_group_ids        = module.security_groups.ssh_internal_flat_sg_id
+  private_subnet_id             = module.vpc.private_subnet_id
+  private_ip_address            = var.sca_mcp_server_private_ip
+  region                        = var.region
+  cyberark_secret_arn           = var.cyberark_secret_arn
+  identity_tenant_id            = var.identity_tenant_id
+  platform_tenant_name          = var.platform_tenant_name
+  workspace_id                  = data.aws_caller_identity.current.account_id
+  workspace_type                = var.workspace_type
+  sca_mcp_server_hostname       = var.sca_mcp_server_hostname
+  ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  username_domain               = var.username_domain
 }
 
 module "db_subnet_group" {

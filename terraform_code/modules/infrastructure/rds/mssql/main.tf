@@ -37,5 +37,6 @@ resource "aws_db_instance" "mssql" {
     I_Owner         = var.asset_owner_name
     I_Purpose     = "Murphys Lab MSSQL Target"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 }

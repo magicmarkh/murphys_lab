@@ -21,5 +21,6 @@ resource "aws_instance" "automation_station" {
     Name = "${var.team_name}-automation-station"
     Owner = var.asset_owner_name
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 }

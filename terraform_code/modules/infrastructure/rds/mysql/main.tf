@@ -30,5 +30,6 @@ resource "aws_db_instance" "mysql" {
     I_Owner = var.asset_owner_name
     I_Purpose = "Murphys Lab MySQL Target"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 }

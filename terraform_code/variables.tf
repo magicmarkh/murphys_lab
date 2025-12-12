@@ -98,6 +98,11 @@ variable "sia_aws_connector_1_private_ip" {
   type = string
 }
 
+variable "sca_mcp_server_private_ip" {
+  description = "private ip of sca mcp server"
+  type = string
+}
+
 variable "domain_join_username" {
   description = "Domain join username (e.g., CORP\\joinuser)"
   type        = string
@@ -170,6 +175,11 @@ variable "connector_2_hostname" {
   type = string
 }
 
+variable "sca_mcp_server_hostname" {
+  description = "name of the sca mcp server"
+  type = string
+}
+
 variable "enable_mssql_domain_join" {
   description = "Enable domain join for MSSQL RDS instance"
   type        = bool
@@ -188,3 +198,8 @@ variable "mssql_domain_ou" {
   default     = null
 }
 
+variable "username_domain" {
+  description = "domain to append to service accounts if needed."
+  default = null
+  type = string
+}

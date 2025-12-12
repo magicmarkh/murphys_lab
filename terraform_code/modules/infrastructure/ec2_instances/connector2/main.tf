@@ -38,6 +38,7 @@ resource "aws_instance" "connector_2" {
     I_Owner       = var.asset_owner_name
     I_Purpose     = "Murphy's Lab Windows connector - automated example"
     CA_iScheduler = var.iScheduler
+    CA_iSchedulerControl = "yes"
   }
 }
 
