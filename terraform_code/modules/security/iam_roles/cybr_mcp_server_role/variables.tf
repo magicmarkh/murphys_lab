@@ -1,13 +1,13 @@
 variable "role_name" {
   description = "Name of the IAM role"
   type        = string
-  default     = "sca-mcp-server-role"
+  default     = "cybr-mcp-server-role"
 }
 
 variable "instance_profile_name" {
   description = "Name of the instance profile"
   type        = string
-  default     = "sca-mcp-server-instance-profile"
+  default     = "cybr-mcp-server-instance-profile"
 }
 
 variable "cyberark_secret_arn" {

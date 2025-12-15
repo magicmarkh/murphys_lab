@@ -27,7 +27,7 @@ set_hostname() {
         
         echo "[init] Hostname and /etc/hosts updated."
         echo "[init] Hostname setup complete."
-    } 2>&1 | tee -a "$LOG"
+    } 2>&1 | tee -a "$LOG"s
     
     touch "$FLAG"
 }

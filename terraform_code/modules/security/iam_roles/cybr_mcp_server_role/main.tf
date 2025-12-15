@@ -1,4 +1,4 @@
-# IAM role & instance profile for SCA MCP Server with Secrets Manager and ECR access
+# IAM role & instance profile for CyberArk MCP Server with Secrets Manager and ECR access
 
 # EC2 assume role policy
 data "aws_iam_policy_document" "ec2_assume" {
@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "ec2_assume" {
 }
 
 # Create the IAM role
-resource "aws_iam_role" "sca_mcp_server_role" {
+resource "aws_iam_role" "cybr_mcp_server_role" {
   name               = var.role_name
   assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
 }
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "secrets" {
 
 resource "aws_iam_role_policy" "secrets_policy" {
   name   = "secrets_manager_access"
-  role   = aws_iam_role.sca_mcp_server_role.id
+  role   = aws_iam_role.cybr_mcp_server_role.id
   policy = data.aws_iam_policy_document.secrets.json
 }
 
@@ -50,12 +50,12 @@ data "aws_iam_policy_document" "ecr" {
 
 resource "aws_iam_role_policy" "ecr_policy" {
   name   = "ecr_pull_access"
-  role   = aws_iam_role.sca_mcp_server_role.id
+  role   = aws_iam_role.cybr_mcp_server_role.id
   policy = data.aws_iam_policy_document.ecr.json
 }
 
 # Instance profile for EC2
-resource "aws_iam_instance_profile" "sca_mcp_server_instance_profile" {
+resource "aws_iam_instance_profile" "cybr_mcp_server_instance_profile" {
   name = var.instance_profile_name
-  role = aws_iam_role.sca_mcp_server_role.name
+  role = aws_iam_role.cybr_mcp_server_role.name
 }

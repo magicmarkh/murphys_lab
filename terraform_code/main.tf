@@ -123,8 +123,8 @@ module "ec2_asm_role" {
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
-module "sca_mcp_server_role" {
-  source              = "./modules/security/iam_roles/sca_mcp_server_role"
+module "cybr_mcp_server_role" {
+  source              = "./modules/security/iam_roles/cybr_mcp_server_role"
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
@@ -171,8 +171,8 @@ module "targets" {
   windows_ami_id                = var.amzn_windows_server_ami_id
 }
 
-module "sca_mcp_server" {
-  source                        = "./modules/infrastructure/ec2_instances/sca_mcp_server"
+module "cybr_mcp_server" {
+  source                        = "./modules/infrastructure/ec2_instances/cybr_mcp_server"
   vpc_id                        = module.vpc.vpc_id
   team_name                     = var.team_name
   asset_owner_name              = var.asset_owner_name
@@ -181,15 +181,15 @@ module "sca_mcp_server" {
   ami_id                        = var.amzn_linux_ami_id
   vpc_security_group_ids        = module.security_groups.ssh_internal_flat_sg_id
   private_subnet_id             = module.vpc.private_subnet_id
-  private_ip_address            = var.sca_mcp_server_private_ip
+  private_ip_address            = var.mcp_server_private_ip
   region                        = var.region
   cyberark_secret_arn           = var.cyberark_secret_arn
   identity_tenant_id            = var.identity_tenant_id
   platform_tenant_name          = var.platform_tenant_name
   workspace_id                  = data.aws_caller_identity.current.account_id
   workspace_type                = var.workspace_type
-  sca_mcp_server_hostname       = var.sca_mcp_server_hostname
-  ec2_asm_instance_profile_name = module.sca_mcp_server_role.instance_profile_name
+  mcp_server_hostname           = var.mcp_server_hostname
+  ec2_asm_instance_profile_name = module.cybr_mcp_server_role.instance_profile_name
   username_domain               = var.username_domain
 }
 

@@ -98,8 +98,8 @@ variable "sia_aws_connector_1_private_ip" {
   type = string
 }
 
-variable "sca_mcp_server_private_ip" {
-  description = "private ip of sca mcp server"
+variable "mcp_server_private_ip" {
+  description = "private ip of CyberArk MCP server"
   type = string
 }
 
@@ -175,8 +175,8 @@ variable "connector_2_hostname" {
   type = string
 }
 
-variable "sca_mcp_server_hostname" {
-  description = "name of the sca mcp server"
+variable "mcp_server_hostname" {
+  description = "name of the CyberArk MCP server"
   type = string
 }
 

@@ -1,7 +1,7 @@
-// modules/sca_mcp_server/main.tf
+// modules/cybr_mcp_server/main.tf
 
 #create the instance
-resource "aws_instance" "sca_mcp_server" {
+resource "aws_instance" "cybr_mcp_server" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   subnet_id                   = var.private_subnet_id
@@ -30,13 +30,13 @@ resource "aws_instance" "sca_mcp_server" {
     chmod +x /tmp/init.sh
     
     # Run the combined init script with hostname parameter
-    /tmp/init.sh "${var.sca_mcp_server_hostname}"
+    /tmp/init.sh "${var.mcp_server_hostname}"
   EOF
 
   tags = {
-    Name  = "${var.team_name}-sca-mcp-server"
+    Name  = "${var.team_name}-cybr-mcp-server"
     I_Owner = var.asset_owner_name
-    I_Purpose = "Murphys Lab SCA MCP Server"
+    I_Purpose = "Murphys Lab CyberArk MCP Server"
     CA_iScheduler = var.iScheduler
     CA_iSchedulerControl = "yes"
   }

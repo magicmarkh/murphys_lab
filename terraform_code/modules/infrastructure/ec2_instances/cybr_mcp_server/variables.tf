@@ -12,7 +12,7 @@ variable "identity_tenant_id" {}
 variable "platform_tenant_name" {}
 variable "workspace_id" {}
 variable "workspace_type" {}
-variable "sca_mcp_server_hostname" {}
+variable "mcp_server_hostname" {}
 variable "ec2_asm_instance_profile_name" {}
 variable "username_domain" {}
 
