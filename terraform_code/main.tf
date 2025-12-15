@@ -123,6 +123,11 @@ module "ec2_asm_role" {
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
+module "sca_mcp_server_role" {
+  source              = "./modules/security/iam_roles/sca_mcp_server_role"
+  cyberark_secret_arn = [var.cyberark_secret_arn]
+}
+
 module "aws_sia_conector" {
   source                         = "./modules/infrastructure/ec2_instances/aws_sia_connector"
   private_subnet_id              = module.vpc.private_subnet_id
@@ -184,7 +189,7 @@ module "sca_mcp_server" {
   workspace_id                  = data.aws_caller_identity.current.account_id
   workspace_type                = var.workspace_type
   sca_mcp_server_hostname       = var.sca_mcp_server_hostname
-  ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  ec2_asm_instance_profile_name = module.sca_mcp_server_role.instance_profile_name
   username_domain               = var.username_domain
 }
 
