@@ -7,6 +7,11 @@ resource "aws_instance" "us-ent-east-dc1" {
   vpc_security_group_ids      = var.security_group_ids
   private_ip                  = var.private_ip
 
+  root_block_device {
+    volume_size = 50
+    volume_type = "gp3"
+  }
+
   tags = {
     Name  = "${var.team_name}-dc1"
     I_Owner = var.asset_owner_name

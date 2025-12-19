@@ -63,6 +63,11 @@ resource "aws_instance" "target_windows_server" {
   vpc_security_group_ids      = var.windows_security_group_ids
   private_ip = var.windows_target_1_private_ip
 
+  root_block_device {
+    volume_size = 50
+    volume_type = "gp3"
+  }
+
   tags = {
     Name  = "${var.team_name}-windows-target-1"
     I_Owner = var.asset_owner_name
