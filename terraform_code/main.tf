@@ -99,7 +99,10 @@ module "cyberark_connectors" {
   windows_ami_id                 = var.amzn_windows_server_ami_id
   key_name                       = module.key_pair.key_name
   iScheduler                     = var.iScheduler
-  windows_security_group_ids     = module.security_groups.rdp_internal_flat_sg_id
+  windows_security_group_ids     = [
+    module.security_groups.rdp_internal_flat_sg_id,
+    module.security_groups.https_internal_flat_sg_id
+  ]
   private_subnet_id              = module.vpc.private_subnet_id
   connector_1_private_ip         = var.connector_1_private_ip
   sia_aws_connector_1_private_ip = var.sia_aws_connector_1_private_ip
@@ -110,6 +113,15 @@ module "aws_sm_secrets" {
   domain_join_password    = var.domain_join_password
   domain_join_secret_name = var.domain_join_secret_name
   domain_join_username    = var.domain_join_username
+}
+
+module "connector_manager" {
+  source              = "./modules/cyberark_identity/connector_manager"
+  network_name        = var.connector_network_name
+  pool_name           = var.connector_pool_name1
+  pool_description    = var.connector_pool_description
+  tags                = var.connector_manager_tags
+  pool_identifiers    = var.connector_pool_identifiers
 }
 
 module "secrets_hub_onboarding_role" {
@@ -171,6 +183,7 @@ module "targets" {
   windows_ami_id                = var.amzn_windows_server_ami_id
 }
 
+/*
 module "cybr_mcp_server" {
   source                        = "./modules/infrastructure/ec2_instances/cybr_mcp_server"
   vpc_id                        = module.vpc.vpc_id
@@ -191,7 +204,7 @@ module "cybr_mcp_server" {
   mcp_server_hostname           = var.mcp_server_hostname
   ec2_asm_instance_profile_name = module.cybr_mcp_server_role.instance_profile_name
   username_domain               = var.username_domain
-}
+}*/
 
 module "db_subnet_group" {
   source             = "./modules/networking/db_subnet_group"

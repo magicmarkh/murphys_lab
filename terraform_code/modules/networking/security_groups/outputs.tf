@@ -88,3 +88,13 @@ output "mssql_target_sg_id" {
   description = "The id of the security group"
   value = aws_security_group.mssql_target_sg.id
 }
+
+output "https_internal_flat_sg_id" {
+  description = "The ID of the security group"
+  value = aws_security_group.https_internal_flat.id
+}
+
+output "https_internal_flat_sg_name" {
+  description = "The name of the security group"
+  value = aws_security_group.https_internal_flat.name
+}
