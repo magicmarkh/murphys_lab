@@ -47,3 +47,9 @@ backend.tf
 
 #mcp
 /mcp/
+
+#backup files
+*.bak
+*.bak2
+
+.claude/settings.local.json

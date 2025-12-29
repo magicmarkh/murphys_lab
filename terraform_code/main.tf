@@ -1,5 +1,24 @@
 data "aws_caller_identity" "current" {}
 
+# =====================================================================
+# REMOTE STATE - Foundation Layer
+# =====================================================================
+data "terraform_remote_state" "foundation" {
+  backend = "s3"
+
+  config = {
+    bucket = "us-ent-east"
+    key    = "terraform/foundation.tfstate"
+    region = "us-east-2"
+  }
+}
+
+# =====================================================================
+# FOUNDATION MODULES - Managed in foundation/ directory
+# These modules are now managed separately and accessed via remote state
+# =====================================================================
+
+/*
 module "vpc" {
   source              = "./modules/networking/vpc"
   region              = var.region
@@ -22,13 +41,6 @@ module "s3_bucket" {
   s3_vpc_endpoint_id = module.vpc.s3_vpc_endpoint_id
 }
 
-module "key_pair" {
-  source           = "./modules/security/key_pair"
-  server_key_name  = "${var.team_name}-key"
-  team_name        = var.team_name
-  asset_owner_name = var.asset_owner_name
-}
-
 module "security_groups" {
   source              = "./modules/networking/security_groups"
   asset_owner_name    = var.asset_owner_name
@@ -39,11 +51,24 @@ module "security_groups" {
   private_subnet_cidr = var.private_subnet_cidr
   public_subnet_cidr  = var.public_subnet_cidr
 }
+*/
+
+# =====================================================================
+# APPLICATION LAYER MODULES
+# =====================================================================
+
+module "key_pair" {
+  source           = "./modules/security/key_pair"
+  server_key_name  = "${var.team_name}-key"
+  team_name        = var.team_name
+  asset_owner_name = var.asset_owner_name
+}
+
 /*
 module "ec2_public_server" {
   source                     = "./modules/infrastructure/ec2_instances/ec2_public_server"
-  vpc_id                     = module.vpc.vpc_id
-  public_subnet_id           = module.vpc.public_subnet_id
+  vpc_id                     = data.terraform_remote_state.foundation.outputs.vpc_id
+  public_subnet_id           = data.terraform_remote_state.foundation.outputs.public_subnet_id
   team_name                  = var.team_name
   asset_owner_name           = var.asset_owner_name
   linux_ami_id               = var.amzn_linux_ami_id
@@ -51,59 +76,59 @@ module "ec2_public_server" {
   key_name                   = module.key_pair.key_name
   trusted_ips                = var.trusted_ips
   iScheduler                 = var.iScheduler
-  linux_security_group_ids   = module.security_groups.trusted_ssh_external_security_group_id
-  windows_security_group_ids = module.security_groups.trusted_rdp_external_security_group_id
+  linux_security_group_ids   = data.terraform_remote_state.foundation.outputs.trusted_ssh_external_security_group_id
+  windows_security_group_ids = data.terraform_remote_state.foundation.outputs.trusted_rdp_external_security_group_id
 }
 
 module "jenkins_server_role" {
   source           = "./modules/security/iam_roles/jenkins_server_role"
   team_name        = var.team_name
-  s3_bucket_arn    = module.s3_bucket.bucket_arn
-  vpc_arn          = module.vpc.vpc_arn
+  s3_bucket_arn    = data.terraform_remote_state.foundation.outputs.bucket_arn
+  vpc_arn          = data.terraform_remote_state.foundation.outputs.vpc_arn
   asset_owner_name = var.asset_owner_name
 }
 
 
 module "automation_station" {
   source                 = "./modules/infrastructure/ec2_instances/automation_station"
-  vpc_id                 = module.vpc.vpc_id
-  private_subnet_id      = module.vpc.private_subnet_id
+  vpc_id                 = data.terraform_remote_state.foundation.outputs.vpc_id
+  private_subnet_id      = data.terraform_remote_state.foundation.outputs.private_subnet_id
   team_name              = var.team_name
   asset_owner_name       = var.asset_owner_name
   ami_id                 = var.amzn_linux_ami_id
   key_name               = module.key_pair.key_name
   iScheduler             = var.iScheduler
-  vpc_security_group_ids = [module.security_groups.ssh_internal_flat_sg_id, module.security_groups.jenkins_8080_flat_sg_id]
+  vpc_security_group_ids = [data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.jenkins_8080_flat_sg_id]
   private_ip_address     = var.automation_station_private_ip
 }
 */
 module "dc" {
   source             = "./modules/infrastructure/ec2_instances/dc"
-  vpc_id             = module.vpc.vpc_id
+  vpc_id             = data.terraform_remote_state.foundation.outputs.vpc_id
   team_name          = var.team_name
   asset_owner_name   = var.asset_owner_name
   key_name           = module.key_pair.key_name
   iScheduler         = var.iScheduler
-  security_group_ids = [module.security_groups.rdp_internal_flat_sg_id, module.security_groups.domain_controller_sg_id]
+  security_group_ids = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.domain_controller_sg_id]
   private_ip         = var.dc1_private_ip
-  private_subnet_id  = module.vpc.private_subnet_id
+  private_subnet_id  = data.terraform_remote_state.foundation.outputs.private_subnet_id
 }
 
 
 
 module "cyberark_connectors" {
   source                         = "./modules/infrastructure/ec2_instances/cyberark_connectors"
-  vpc_id                         = module.vpc.vpc_id
+  vpc_id                         = data.terraform_remote_state.foundation.outputs.vpc_id
   team_name                      = var.team_name
   asset_owner_name               = var.asset_owner_name
   windows_ami_id                 = var.amzn_windows_server_ami_id
   key_name                       = module.key_pair.key_name
   iScheduler                     = var.iScheduler
   windows_security_group_ids     = [
-    module.security_groups.rdp_internal_flat_sg_id,
-    module.security_groups.https_internal_flat_sg_id
+    data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id,
+    data.terraform_remote_state.foundation.outputs.https_internal_flat_sg_id
   ]
-  private_subnet_id              = module.vpc.private_subnet_id
+  private_subnet_id              = data.terraform_remote_state.foundation.outputs.private_subnet_id
   connector_1_private_ip         = var.connector_1_private_ip
   sia_aws_connector_1_private_ip = var.sia_aws_connector_1_private_ip
 }
@@ -142,11 +167,11 @@ module "cybr_mcp_server_role" {
 
 module "aws_sia_conector" {
   source                         = "./modules/infrastructure/ec2_instances/aws_sia_connector"
-  private_subnet_id              = module.vpc.private_subnet_id
+  private_subnet_id              = data.terraform_remote_state.foundation.outputs.private_subnet_id
   key_name                       = module.key_pair.key_name
   team_name                      = var.team_name
-  linux_security_group_ids       = module.security_groups.ssh_internal_flat_sg_id
-  vpc_id                         = module.vpc.vpc_id
+  linux_security_group_ids       = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
+  vpc_id                         = data.terraform_remote_state.foundation.outputs.vpc_id
   linux_ami_id                   = var.amzn_linux_ami_id
   iScheduler                     = var.iScheduler
   asset_owner_name               = var.asset_owner_name
@@ -161,15 +186,15 @@ module "aws_sia_conector" {
 
 module "targets" {
   source                        = "./modules/infrastructure/ec2_instances/targets"
-  vpc_id                        = module.vpc.vpc_id
+  vpc_id                        = data.terraform_remote_state.foundation.outputs.vpc_id
   team_name                     = var.team_name
   asset_owner_name              = var.asset_owner_name
   key_name                      = module.key_pair.key_name
   iScheduler                    = var.iScheduler
   linux_ami_id                  = var.amzn_linux_ami_id
-  windows_security_group_ids    = [module.security_groups.rdp_internal_flat_sg_id, module.security_groups.sia_windows_target_sg_id]
-  linux_security_group_ids      = module.security_groups.ssh_internal_flat_sg_id
-  private_subnet_id             = module.vpc.private_subnet_id
+  windows_security_group_ids    = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.sia_windows_target_sg_id]
+  linux_security_group_ids      = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
+  private_subnet_id             = data.terraform_remote_state.foundation.outputs.private_subnet_id
   windows_target_1_private_ip   = var.windows_target_1_private_ip
   linux_target_1_private_ip     = var.linux_target_1_private_ip
   region                        = var.region
@@ -186,14 +211,14 @@ module "targets" {
 /*
 module "cybr_mcp_server" {
   source                        = "./modules/infrastructure/ec2_instances/cybr_mcp_server"
-  vpc_id                        = module.vpc.vpc_id
+  vpc_id                        = data.terraform_remote_state.foundation.outputs.vpc_id
   team_name                     = var.team_name
   asset_owner_name              = var.asset_owner_name
   key_name                      = module.key_pair.key_name
   iScheduler                    = var.iScheduler
   ami_id                        = var.amzn_linux_ami_id
-  vpc_security_group_ids        = module.security_groups.ssh_internal_flat_sg_id
-  private_subnet_id             = module.vpc.private_subnet_id
+  vpc_security_group_ids        = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
+  private_subnet_id             = data.terraform_remote_state.foundation.outputs.private_subnet_id
   private_ip_address            = var.mcp_server_private_ip
   region                        = var.region
   cyberark_secret_arn           = var.cyberark_secret_arn
@@ -209,7 +234,7 @@ module "cybr_mcp_server" {
 module "db_subnet_group" {
   source             = "./modules/networking/db_subnet_group"
   team_name          = var.team_name
-  private_subnet_ids = [module.vpc.private_subnet_id, module.vpc.public_subnet_id]
+  private_subnet_ids = [data.terraform_remote_state.foundation.outputs.private_subnet_id, data.terraform_remote_state.foundation.outputs.public_subnet_id]
 }
 
 module "mysql" {
@@ -217,7 +242,7 @@ module "mysql" {
   iScheduler             = var.iScheduler
   db_subnet_group_name   = module.db_subnet_group.db_subnet_group_name
   asset_owner_name       = var.asset_owner_name
-  vpc_security_group_ids = [module.security_groups.mysql_target_sg_id]
+  vpc_security_group_ids = [data.terraform_remote_state.foundation.outputs.mysql_target_sg_id]
 }
 
 module "postgresql" {
@@ -225,7 +250,7 @@ module "postgresql" {
   iScheduler             = var.iScheduler
   db_subnet_group_name   = module.db_subnet_group.db_subnet_group_name
   asset_owner_name       = var.asset_owner_name
-  vpc_security_group_ids = [module.security_groups.postgresql_target_sg_id]
+  vpc_security_group_ids = [data.terraform_remote_state.foundation.outputs.postgresql_target_sg_id]
   team_name              = var.team_name
 }
 
@@ -234,7 +259,7 @@ module "mssql" {
   iScheduler             = var.iScheduler
   db_subnet_group_name   = module.db_subnet_group.db_subnet_group_name
   asset_owner_name       = var.asset_owner_name
-  vpc_security_group_ids = [module.security_groups.mssql_target_sg_id]
+  vpc_security_group_ids = [data.terraform_remote_state.foundation.outputs.mssql_target_sg_id]
   domain_auth_secret_arn = var.mssql_domain_join_arn
   domain_ou              = var.mssql_domain_ou
 }
@@ -243,10 +268,10 @@ module "mssql" {
 module "connector2" {
   source                     = "./modules/infrastructure/ec2_instances/connector2"
   iScheduler                 = var.iScheduler
-  windows_security_group_ids = [module.security_groups.rdp_internal_flat_sg_id, module.security_groups.winrm_internal_flat_sg_id]
+  windows_security_group_ids = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.winrm_internal_flat_sg_id]
   domain_join_secret_arn     = var.domain_join_secret_arn
   iam_instance_profile       = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
-  private_subnet_id          = module.vpc.private_subnet_id
+  private_subnet_id          = data.terraform_remote_state.foundation.outputs.private_subnet_id
   identity_secret_arn        = var.cyberark_secret_arn
   hostname                   = var.connector_2_hostname
   identity_tenant_id         = var.identity_tenant_id
@@ -256,7 +281,7 @@ module "connector2" {
   team_name                  = var.team_name
   asset_owner_name           = var.asset_owner_name
   key_name                   = module.key_pair.key_name
-  vpc_id                     = module.vpc.vpc_id
+  vpc_id                     = data.terraform_remote_state.foundation.outputs.vpc_id
   connector_pool_name        = var.connector_pool_name
   private_ip                 = var.connector_2_private_ip
   domain_name                = var.domain_name
