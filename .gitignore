@@ -52,6 +52,8 @@ backend.tf
 *.bak
 *.bak2
 
+#log files
+*.log
 .claude/settings.local.json
 .claude/settings.local.json
 terraform_code/cyberark/terraform.log
