@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 module "vpc" {
-  source              = "../modules/networking/vpc"
+  source              = "./networking/vpc"
   region              = var.region
   asset_owner_name    = var.asset_owner_name
   team_name           = var.team_name
@@ -15,7 +15,7 @@ module "vpc" {
 }
 
 module "s3_bucket" {
-  source             = "../modules/s3_bucket"
+  source             = "./s3_bucket"
   region             = var.region
   asset_owner_name   = var.asset_owner_name
   bucket_name        = var.team_name
@@ -23,7 +23,7 @@ module "s3_bucket" {
 }
 
 module "security_groups" {
-  source              = "../modules/networking/security_groups"
+  source              = "./networking/security_groups"
   asset_owner_name    = var.asset_owner_name
   vpc_id              = module.vpc.vpc_id
   trusted_ips         = var.trusted_ips

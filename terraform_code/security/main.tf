@@ -17,7 +17,7 @@ data "terraform_remote_state" "foundation" {
 # SECRETS MANAGER
 # =====================================================================
 module "aws_sm_secrets" {
-  source                  = "../modules/security/aws_sm_secrets"
+  source                  = "./aws_sm_secrets"
   domain_join_password    = var.domain_join_password
   domain_join_secret_name = var.domain_join_secret_name
   domain_join_username    = var.domain_join_username
@@ -27,18 +27,18 @@ module "aws_sm_secrets" {
 # IAM ROLES
 # =====================================================================
 module "secrets_hub_onboarding_role" {
-  source                    = "../modules/security/iam_roles/secrets_hub_onboarding_role"
+  source                    = "./iam_roles/secrets_hub_onboarding_role"
   SecretsManagerRegion      = var.region
   CyberArkSecretsHubRoleARN = var.CyberArkSecretsHubRoleARN
 }
 
 module "ec2_asm_role" {
-  source              = "../modules/security/iam_roles/ec2_asm_role"
+  source              = "./iam_roles/ec2_asm_role"
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
 module "cybr_mcp_server_role" {
-  source              = "../modules/security/iam_roles/cybr_mcp_server_role"
+  source              = "./iam_roles/cybr_mcp_server_role"
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 

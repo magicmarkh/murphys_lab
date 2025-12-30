@@ -56,3 +56,4 @@ backend.tf
 .claude/settings.local.json
 terraform_code/cyberark/terraform.log
 terraform_code/terraform.log
+.claude/settings.local.json
