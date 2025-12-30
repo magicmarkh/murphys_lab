@@ -68,27 +68,6 @@ variable "mcp_server_private_ip" {
   type = string
 }
 
-variable "domain_join_username" {
-  description = "Domain join username (e.g., CORP\\joinuser)"
-  type        = string
-}
-
-variable "domain_join_password" {
-  description = "Domain join password"
-  type        = string
-  sensitive   = true
-}
-
-variable "domain_join_secret_name" {
-  description = "Secrets Manager secret name"
-  type        = string
-}
-
-variable "CyberArkSecretsHubRoleARN" {
-  description = "The Secrets Hub tenant role ARN which will be trusted by this role - get this from the cyberark tenant in secrets hub settings."
-  type        = string
-}
-
 variable "connector_pool_name" {
   description = "Name of the connector pool you're adding the connector to"
   type        = string
@@ -166,58 +145,5 @@ variable "mssql_domain_ou" {
 variable "username_domain" {
   description = "domain to append to service accounts if needed."
   default = null
-  type = string
-}
-
-variable "identity_tenant_url" {
-  description = "CyberArk Identity tenant URL (e.g., https://abc123.id.cyberark.cloud)"
-  type        = string
-}
-
-variable "identity_client_id" {
-  description = "CyberArk Identity OAuth client ID"
-  type        = string
-  sensitive   = true
-}
-
-variable "identity_client_secret" {
-  description = "CyberArk Identity OAuth client secret"
-  type        = string
-  sensitive   = true
-}
-
-variable "connector_network_name" {
-  description = "Name of the connector network"
-  type        = string
-}
-
-variable "connector_network_description" {
-  description = "Description of the connector network"
-  type        = string
-  default     = ""
-}
-
-variable "connector_pool_description" {
-  description = "Description of the connector manager pool"
-  type        = string
-  default     = ""
-}
-
-variable "connector_manager_tags" {
-  description = "Tags to apply to the connector manager pool"
-  type = map(object({
-    key   = string
-    value = string
-  }))
-  default = {}
-}
-
-variable "connector_pool_identifiers" {
-  description = "List of identifiers to add to the connector manager pool"
-  type        = list(string)
-  default     = []
-}
-
-variable "connector_pool_name1" {
   type = string
 }

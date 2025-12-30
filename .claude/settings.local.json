@@ -1,10 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(rm:*)",
-      "Bash(terraform apply:*)",
-      "Bash(terraform state rm:*)",
-      "Bash(terraform plan:*)"
     ],
     "deny": []
   }

@@ -14,6 +14,32 @@ data "terraform_remote_state" "foundation" {
 }
 
 # =====================================================================
+# REMOTE STATE - Security Layer
+# =====================================================================
+data "terraform_remote_state" "security" {
+  backend = "s3"
+
+  config = {
+    bucket = "us-ent-east"
+    key    = "terraform/security.tfstate"
+    region = "us-east-2"
+  }
+}
+
+# =====================================================================
+# REMOTE STATE - CyberArk Layer
+# =====================================================================
+data "terraform_remote_state" "cyberark" {
+  backend = "s3"
+
+  config = {
+    bucket = "us-ent-east"
+    key    = "terraform/cyberark.tfstate"
+    region = "us-east-2"
+  }
+}
+
+# =====================================================================
 # FOUNDATION MODULES - Managed in foundation/ directory
 # These modules are now managed separately and accessed via remote state
 # =====================================================================
@@ -80,15 +106,6 @@ module "ec2_public_server" {
   windows_security_group_ids = data.terraform_remote_state.foundation.outputs.trusted_rdp_external_security_group_id
 }
 
-module "jenkins_server_role" {
-  source           = "./modules/security/iam_roles/jenkins_server_role"
-  team_name        = var.team_name
-  s3_bucket_arn    = data.terraform_remote_state.foundation.outputs.bucket_arn
-  vpc_arn          = data.terraform_remote_state.foundation.outputs.vpc_arn
-  asset_owner_name = var.asset_owner_name
-}
-
-
 module "automation_station" {
   source                 = "./modules/infrastructure/ec2_instances/automation_station"
   vpc_id                 = data.terraform_remote_state.foundation.outputs.vpc_id
@@ -133,20 +150,17 @@ module "cyberark_connectors" {
   sia_aws_connector_1_private_ip = var.sia_aws_connector_1_private_ip
 }
 
+# =====================================================================
+# SECURITY MODULES - Managed in security/ directory
+# These modules are now managed separately and accessed via remote state
+# =====================================================================
+
+/*
 module "aws_sm_secrets" {
-  source                  = "./modules/infrastructure/aws_sm_secrets"
+  source                  = "./modules/security/aws_sm_secrets"
   domain_join_password    = var.domain_join_password
   domain_join_secret_name = var.domain_join_secret_name
   domain_join_username    = var.domain_join_username
-}
-
-module "connector_manager" {
-  source              = "./modules/cyberark_identity/connector_manager"
-  network_name        = var.connector_network_name
-  pool_name           = var.connector_pool_name1
-  pool_description    = var.connector_pool_description
-  tags                = var.connector_manager_tags
-  pool_identifiers    = var.connector_pool_identifiers
 }
 
 module "secrets_hub_onboarding_role" {
@@ -164,6 +178,23 @@ module "cybr_mcp_server_role" {
   source              = "./modules/security/iam_roles/cybr_mcp_server_role"
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
+*/
+
+# =====================================================================
+# CYBERARK MODULES - Managed in cyberark/ directory
+# These modules are now managed separately and accessed via remote state
+# =====================================================================
+
+/*
+module "connector_manager" {
+  source              = "./modules/cyberark/connector_manager"
+  network_name        = var.connector_network_name
+  pool_name           = var.connector_pool_name1
+  pool_description    = var.connector_pool_description
+  tags                = var.connector_manager_tags
+  pool_identifiers    = var.connector_pool_identifiers
+}
+*/
 
 module "aws_sia_conector" {
   source                         = "./modules/infrastructure/ec2_instances/aws_sia_connector"
@@ -181,7 +212,7 @@ module "aws_sia_conector" {
   cyberark_secret_arn            = var.cyberark_secret_arn
   identity_tenant_id             = var.identity_tenant_id
   platform_tenant_name           = var.platform_tenant_name
-  ec2_asm_instance_profile_name  = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  ec2_asm_instance_profile_name  = data.terraform_remote_state.security.outputs.ec2_asm_instance_profile_name
 }
 
 module "targets" {
@@ -204,7 +235,7 @@ module "targets" {
   workspace_id                  = data.aws_caller_identity.current.account_id
   workspace_type                = var.workspace_type
   linux_target_1_hostname       = var.linux_target_1_hostname
-  ec2_asm_instance_profile_name = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  ec2_asm_instance_profile_name = data.terraform_remote_state.security.outputs.ec2_asm_instance_profile_name
   windows_ami_id                = var.amzn_windows_server_ami_id
 }
 
@@ -227,7 +258,7 @@ module "cybr_mcp_server" {
   workspace_id                  = data.aws_caller_identity.current.account_id
   workspace_type                = var.workspace_type
   mcp_server_hostname           = var.mcp_server_hostname
-  ec2_asm_instance_profile_name = module.cybr_mcp_server_role.instance_profile_name
+  ec2_asm_instance_profile_name = data.terraform_remote_state.security.outputs.cybr_mcp_server_instance_profile_name
   username_domain               = var.username_domain
 }*/
 
@@ -270,7 +301,7 @@ module "connector2" {
   iScheduler                 = var.iScheduler
   windows_security_group_ids = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.winrm_internal_flat_sg_id]
   domain_join_secret_arn     = var.domain_join_secret_arn
-  iam_instance_profile       = module.ec2_asm_role.us_ent_east_ec2_asm_instance_profile_name
+  iam_instance_profile       = data.terraform_remote_state.security.outputs.ec2_asm_instance_profile_name
   private_subnet_id          = data.terraform_remote_state.foundation.outputs.private_subnet_id
   identity_secret_arn        = var.cyberark_secret_arn
   hostname                   = var.connector_2_hostname
