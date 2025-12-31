@@ -8,7 +8,7 @@ data "terraform_remote_state" "foundation" {
 
   config = {
     bucket = "us-ent-east"
-    key    = "terraform/foundation.tfstate"
+    key    = "terraform/01_foundation.tfstate"
     region = "us-east-2"
   }
 }
@@ -21,7 +21,7 @@ data "terraform_remote_state" "security" {
 
   config = {
     bucket = "us-ent-east"
-    key    = "terraform/security.tfstate"
+    key    = "terraform/02_security.tfstate"
     region = "us-east-2"
   }
 }
