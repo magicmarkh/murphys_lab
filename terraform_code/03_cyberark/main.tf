@@ -29,8 +29,8 @@ data "terraform_remote_state" "security" {
 # =====================================================================
 # CYBERARK IDENTITY - Connector Manager
 # =====================================================================
-module "connector_manager" {
-  source              = "./connector_manager"
+module "connector_pools" {
+  source              = "./connector_pools"
   network_name        = var.connector_network_name
   pool_name           = var.connector_pool_name1
   pool_description    = var.connector_pool_description
