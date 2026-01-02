@@ -1,14 +1,6 @@
-provider "aws" {
-  region = var.region
-}
-
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.36"
-    }
     idsec = {
       source  = "cyberark/idsec"
       version = "~> 0.1.6"
@@ -30,25 +22,15 @@ provider "conjur" {
 }
 
 data "conjur_secret" "identity_client_id" {
-  name = "data/vault/m-priv-svc-accts/svc_sca_api/username"
+  name = "data/vault/m-priv-svc-accts/svc_tfautomation/username"
 }
 
 data "conjur_secret" "identity_client_secret" {
-  name = "data/vault/m-priv-svc-accts/svc_sca_api/password"
-}
-
-output "identity_client_id_value" {
-  value     = data.conjur_secret.identity_client_id.value
-  sensitive = true
-}
-
-output "identity_client_secret_value" {
-  value     = data.conjur_secret.identity_client_secret.value
-  sensitive = true
+  name = "data/vault/m-priv-svc-accts/svc_tfautomation/password"
 }
 
 provider "idsec" {
   auth_method   = "identity_service_user"
-  service_user  = var.identity_client_id
-  service_token = var.identity_client_secret
+  service_user  = data.conjur_secret.identity_client_id.value
+  service_token = data.conjur_secret.identity_client_secret.value
 }

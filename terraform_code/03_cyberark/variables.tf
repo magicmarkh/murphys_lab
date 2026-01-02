@@ -66,3 +66,29 @@ variable "connector_manager_tags" {
   }))
   default = {}
 }
+
+# ===========================
+# Conjur Variables
+# ===========================
+variable "conjur_appliance_url" {
+  description = "URL of the Conjur appliance"
+  type        = string
+}
+
+variable "conjur_account" {
+  description = "Conjur account name"
+  type        = string
+}
+
+variable "conjur_login" {
+  description = "Conjur login name"
+  type        = string
+}
+
+variable "conjur_api_key" {
+  description = "Conjur API key for the specified login"
+  type        = string
+  sensitive   = true
+}
+
+# ===========================
