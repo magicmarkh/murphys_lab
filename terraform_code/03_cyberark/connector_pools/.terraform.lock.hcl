@@ -1,20 +1,6 @@
 # This file is maintained automatically by "terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/cyberark/conjur" {
-  version     = "0.8.1"
-  constraints = "~> 0.8.1"
-  hashes = [
-    "h1:lVDD1cLbJc4U3kY7u+mSpmB11B+gjFBtF6L8Rw6X3wo=",
-    "zh:068810329c9e9bdc6e30a3da50b5556e2066a0b016afdb98e02cb5b57b717f82",
-    "zh:0c8a43e8321c8f0e001711c9feaace797cde6d4e67bdb6930f82e398a91121d3",
-    "zh:0e7559b23739ed91f61ebcdb3c0bef70b0f5acddc2d88a4fd4f424ec3f083b2b",
-    "zh:1bb991e53034fb4c5fbfb8cb42c2e51caba93b78ab2812ab79a3e772d0524e8d",
-    "zh:39022d02057633003d1d4b15afcdbf57c753ad2947c956f00e81bae0cd383052",
-    "zh:f04a11cdc152ea217aca6153136067dc4b9b3db1814d2bb4b44ba6c2c99872c2",
-  ]
-}
-
 provider "registry.terraform.io/cyberark/idsec" {
   version     = "0.1.7"
   constraints = "~> 0.1.7"
