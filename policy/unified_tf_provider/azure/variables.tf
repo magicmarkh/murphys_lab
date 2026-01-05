@@ -19,6 +19,9 @@ variable "conjur_login" {
   description = "conjur login name"
 }
 
+# ===========================
+# Policy Variables
+# ===========================
 variable "policy_name" {
   type = string
   description = "Name of the policy to be created"
