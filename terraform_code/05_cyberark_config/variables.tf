@@ -102,3 +102,16 @@ variable "conjur_identity_client_secret_path" {
 }
 
 # ===========================
+# Human Users Variables
+# ===========================
+variable "human_users" {
+  type = map(object({
+    username     = string
+    display_name = string
+    email        = string
+  }))
+  description = "Map of human users to manage in Identity"
+  default     = {}
+}
+
+# ===========================

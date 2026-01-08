@@ -37,3 +37,11 @@ module "connector_pools" {
   tags                = var.connector_manager_tags
   pool_identifiers    = var.connector_pool_identifiers
 }
+
+# =====================================================================
+# CYBERARK IDENTITY - Human Users
+# =====================================================================
+module "human_users" {
+  source = "./users/human"
+  users  = var.human_users
+}

@@ -11,7 +11,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.1.7"
+      version = "~> 0.1.8"
     }
     conjur = {
       source  = "cyberark/conjur"
@@ -41,5 +41,4 @@ provider "idsec" {
   auth_method   = "identity_service_user"
   service_user  = data.conjur_secret.identity_client_id.value
   service_token = data.conjur_secret.identity_client_secret.value
-  #subdomain     = "murphyslab"
-}
+  }

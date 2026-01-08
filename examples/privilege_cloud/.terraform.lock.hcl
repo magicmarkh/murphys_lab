@@ -17,7 +17,7 @@ provider "registry.terraform.io/cyberark/conjur" {
 
 provider "registry.terraform.io/cyberark/idsec" {
   version     = "0.1.8"
-  constraints = "~> 0.1.7"
+  constraints = "~> 0.1.8"
   hashes = [
     "h1:9vkgo+HxG1/BQGexkSvm+GaPh2uisgOYrML2fXus4k0=",
     "zh:0ad277082d573c7e31d078b590f803664846c74169c7e92e9d0a77a83bf5387e",
