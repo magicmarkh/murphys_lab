@@ -91,4 +91,14 @@ variable "conjur_api_key" {
   sensitive   = true
 }
 
+variable "conjur_identity_client_id_path" {
+  description = "Conjur secret path for Identity client ID"
+  type        = string
+}
+
+variable "conjur_identity_client_secret_path" {
+  description = "Conjur secret path for Identity client secret"
+  type        = string
+}
+
 # ===========================

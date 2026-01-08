@@ -30,25 +30,16 @@ provider "conjur" {
 }
 
 data "conjur_secret" "identity_client_id" {
-  name = "data/vault/m-priv-svc-accts/svc_sca_api/username"
+  name = var.conjur_identity_client_id_path
 }
 
 data "conjur_secret" "identity_client_secret" {
-  name = "data/vault/m-priv-svc-accts/svc_sca_api/password"
-}
-
-output "identity_client_id_value" {
-  value     = data.conjur_secret.identity_client_id.value
-  sensitive = true
-}
-
-output "identity_client_secret_value" {
-  value     = data.conjur_secret.identity_client_secret.value
-  sensitive = true
+  name = var.conjur_identity_client_secret_path
 }
 
 provider "idsec" {
   auth_method   = "identity_service_user"
-  service_user  = var.identity_client_id
-  service_token = var.identity_client_secret
+  service_user  = data.conjur_secret.identity_client_id.value
+  service_token = data.conjur_secret.identity_client_secret.value
+  #subdomain     = "murphyslab"
 }
