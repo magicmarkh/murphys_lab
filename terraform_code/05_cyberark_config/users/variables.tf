@@ -8,40 +8,6 @@ variable "region" {
 }
 
 # ===========================
-# Connector Manager Variables
-# ===========================
-variable "connector_network_name" {
-  description = "Name of the connector network"
-  type        = string
-}
-
-variable "connector_pool_name1" {
-  description = "Name of the connector pool"
-  type        = string
-}
-
-variable "connector_pool_description" {
-  description = "Description of the connector pool"
-  type        = string
-  default     = ""
-}
-
-variable "connector_pool_identifiers" {
-  description = "List of FQDNs for the connector pool"
-  type        = list(string)
-  default     = []
-}
-
-variable "connector_manager_tags" {
-  description = "Tags to apply to connector manager resources"
-  type = map(object({
-    key   = string
-    value = string
-  }))
-  default = {}
-}
-
-# ===========================
 # Conjur Variables
 # ===========================
 variable "conjur_appliance_url" {
@@ -76,16 +42,13 @@ variable "conjur_identity_client_secret_path" {
 }
 
 # ===========================
-# Human Users Variables
+# Identity User Variables
 # ===========================
-variable "human_users" {
+variable "users" {
   type = map(object({
     username     = string
     display_name = string
     email        = string
   }))
-  description = "Map of human users to manage in Identity"
-  default     = {}
+  description = "Map of existing users to manage"
 }
-
-# ===========================

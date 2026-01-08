@@ -20,7 +20,6 @@ terraform {
   }
 }
 
-
 provider "conjur" {
   appliance_url = var.conjur_appliance_url
   account       = var.conjur_account
@@ -41,4 +40,4 @@ provider "idsec" {
   auth_method   = "identity_service_user"
   service_user  = data.conjur_secret.identity_client_id.value
   service_token = data.conjur_secret.identity_client_secret.value
-  }
+}
