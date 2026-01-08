@@ -8,37 +8,11 @@ variable "region" {
 }
 
 # ===========================
-# CyberArk Identity Variables
-# ===========================
-variable "identity_client_id" {
-  description = "CyberArk Identity OAuth client ID (service user)"
-  type        = string
-  sensitive   = true
-}
-
-variable "identity_client_secret" {
-  description = "CyberArk Identity OAuth client secret"
-  type        = string
-  sensitive   = true
-}
-
-variable "identity_tenant_url" {
-  description = "Full CyberArk Identity tenant URL (e.g., https://abc123.id.cyberark.cloud)"
-  type        = string
-}
-
-# ===========================
 # Connector Manager Variables
 # ===========================
 variable "connector_network_name" {
   description = "Name of the connector network"
   type        = string
-}
-
-variable "connector_network_description" {
-  description = "Description of the connector network"
-  type        = string
-  default     = ""
 }
 
 variable "connector_pool_name1" {
