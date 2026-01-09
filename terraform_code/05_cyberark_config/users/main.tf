@@ -10,7 +10,11 @@ resource "idsec_identity_user" "users" {
   lifecycle {
     ignore_changes = [
       send_email_invite,
-      force_password_change_next
+      force_password_change_next,
+      suffix,
+      user_id,
+      last_login,
+      mobile_number
     ]
   }
 }
