@@ -41,15 +41,15 @@ resource "aws_instance" "linux_target_1" {
     "$SCRIPTS_DIR/configure-endpoint.sh"
   EOF
   tags = {
-    Name  = "${var.team_name}-linux-target-1"
-    I_Owner = var.asset_owner_name
-    I_Purpose = "Murphys Lab Linux Target System"
-    CA_iScheduler = var.iScheduler
+    Name                 = "${var.team_name}-linux-target-1"
+    I_Owner              = var.asset_owner_name
+    I_Purpose            = "Murphys Lab Linux Target System"
+    CA_iScheduler        = var.iScheduler
     CA_iSchedulerControl = "yes"
   }
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags, ami]
   }
 }
 
@@ -61,7 +61,7 @@ resource "aws_instance" "target_windows_server" {
   associate_public_ip_address = false
   key_name                    = var.key_name
   vpc_security_group_ids      = var.windows_security_group_ids
-  private_ip = var.windows_target_1_private_ip
+  private_ip                  = var.windows_target_1_private_ip
 
   root_block_device {
     volume_size = 50
@@ -69,14 +69,14 @@ resource "aws_instance" "target_windows_server" {
   }
 
   tags = {
-    Name  = "${var.team_name}-windows-target-1"
-    I_Owner = var.asset_owner_name
-    I_Purpose = "Murphys Lab Windows Target"
-    CA_iScheduler = var.iScheduler
+    Name                 = "${var.team_name}-windows-target-1"
+    I_Owner              = var.asset_owner_name
+    I_Purpose            = "Murphys Lab Windows Target"
+    CA_iScheduler        = var.iScheduler
     CA_iSchedulerControl = "yes"
   }
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }

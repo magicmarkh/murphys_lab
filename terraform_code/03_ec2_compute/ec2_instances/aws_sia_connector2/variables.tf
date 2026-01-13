@@ -7,7 +7,7 @@ variable "linux_ami_id" {}
 variable "iScheduler" {}
 variable "linux_security_group_ids" {}
 variable "ec2_asm_instance_profile_name" {}
-variable "sia_aws_connector_1_private_ip" {
+variable "sia_aws_connector_2_private_ip" {
   description = "IP of the connector"
   type        = string
 }
@@ -24,7 +24,7 @@ variable "key_name" {
 variable "hostname" {
   description = "Desired hostname on boot"
   type        = string
-  default     = "us-ent-east-sia-aws-connector-1"
+  default     = "us-ent-east-sia-aws-connector-2"
 }
 
 variable "connector_pool_name" {

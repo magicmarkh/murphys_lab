@@ -15,7 +15,8 @@ resource "idsec_pcloud_safe_member" "members" {
   member_type                = each.value.member_type
   search_in                  = try(each.value.search_in, null)
   membership_expiration_date = try(each.value.membership_expiration_date, null)
-
+  permission_set = each.value.permission_set
+/*
   permissions = {
     use_accounts                               = try(each.value.permissions.use_accounts, false)
     retrieve_accounts                          = try(each.value.permissions.retrieve_accounts, false)
@@ -37,7 +38,7 @@ resource "idsec_pcloud_safe_member" "members" {
     create_folders                             = try(each.value.permissions.create_folders, false)
     delete_folders                             = try(each.value.permissions.delete_folders, false)
     move_accounts_and_folders                  = try(each.value.permissions.move_accounts_and_folders, false)
-  }
+  }*/
 }
 
 

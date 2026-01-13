@@ -40,3 +40,16 @@ output "key_name" {
 #   description = "ID of Windows Target 1 instance"
 #   value       = module.targets.windows_target_1_instance_id
 # }
+
+# =====================================================================
+# AMI OUTPUTS
+# =====================================================================
+output "amazon_linux_ami_id" {
+  description = "ID of the Amazon Linux AMI being used"
+  value       = local.linux_ami_id
+}
+
+output "amazon_linux_ami_name" {
+  description = "Name of the Amazon Linux AMI being used"
+  value       = data.aws_ami.amazon_linux_latest.name
+}

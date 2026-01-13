@@ -54,7 +54,8 @@ variable "safe_members" {
     member_type                = string
     search_in                  = optional(string)
     membership_expiration_date = optional(number)
-    permissions = object({
+    permission_set             = string
+   /* permissions = object({
       use_accounts                               = optional(bool)
       retrieve_accounts                          = optional(bool)
       list_accounts                              = optional(bool)
@@ -75,7 +76,7 @@ variable "safe_members" {
       create_folders                             = optional(bool)
       delete_folders                             = optional(bool)
       move_accounts_and_folders                  = optional(bool)
-    })
+    })*/
   }))
   description = "Map of members to add to the safe with their permissions"
   default     = {}

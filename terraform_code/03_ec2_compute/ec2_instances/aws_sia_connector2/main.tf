@@ -5,7 +5,7 @@ resource "aws_instance" "sia_aws_connector" {
   associate_public_ip_address = false
   key_name                    = var.key_name
   vpc_security_group_ids      = [var.linux_security_group_ids]
-  private_ip                  = var.sia_aws_connector_1_private_ip
+  private_ip                  = var.sia_aws_connector_2_private_ip
   iam_instance_profile        = var.ec2_asm_instance_profile_name
 
   user_data = <<-EOF
@@ -38,7 +38,7 @@ resource "aws_instance" "sia_aws_connector" {
   EOF
 
   tags = {
-    Name          = "${var.team_name}-aws-sia-connector-1"
+    Name          = "${var.team_name}-aws-sia-connector-2"
     I_Owner       = var.asset_owner_name
     I_Purpose     = "Murphy's Lab SIA Connector"
     CA_iScheduler = var.iScheduler
@@ -47,4 +47,14 @@ resource "aws_instance" "sia_aws_connector" {
   lifecycle {
     ignore_changes = [tags, ami]
   }
+}
+
+
+resource "idsec_sia_access_connector" "connector2" {
+  connector_type    = "AWS"
+  connector_os      = "linux"
+  connector_pool_id = "2fc8846d-2e29-4aa8-b8a2-d3b4738c8e5e"
+  target_machine    = var.sia_aws_connector_2_private_ip
+  username          = "ec2-user"
+  private_key_path  = "/Users/mark.hurter/Documents/Code/murphys_lab/terraform_code/03_ec2_compute/key_pair/us-ent-east-key.pem"
 }

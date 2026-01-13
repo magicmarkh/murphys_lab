@@ -16,9 +16,9 @@ variable "team_name" {
 }
 
 variable "amzn_linux_ami_id" {
-  description = "ami id for amazon linux ec2"
+  description = "ami id for amazon linux ec2 - defaults to latest Amazon Linux 2023"
   type        = string
-  default     = "ami-058a8a5ab36292159"
+  default     = null
 }
 
 variable "amzn_windows_server_ami_id" {
@@ -58,6 +58,11 @@ variable "sia_aws_connector_1_private_ip" {
   type        = string
 }
 
+variable "sia_aws_connector_2_private_ip" {
+  description = "private ip of sia aws connector 2"
+  type        = string
+}
+
 variable "connector_pool_name" {
   description = "Name of the connector pool you're adding the connector to"
   type        = string
@@ -87,4 +92,43 @@ variable "workspace_type" {
 variable "linux_target_1_hostname" {
   description = "name of the target demo system for linux"
   type        = string
+}
+
+# ===========================
+# Conjur Variables
+# ===========================
+variable "conjur_appliance_url" {
+  description = "URL of the Conjur appliance"
+  type        = string
+  default     = "https://murphyslab.secretsmgr.cyberark.cloud/api"
+}
+
+variable "conjur_account" {
+  description = "Conjur account name"
+  type        = string
+  default     = "conjur"
+}
+
+variable "conjur_login" {
+  description = "Conjur login name"
+  type        = string
+  default     = "host/data/murphys-tf"
+}
+
+variable "conjur_api_key" {
+  description = "Conjur API key for the specified login"
+  type        = string
+  sensitive   = true
+}
+
+variable "conjur_identity_client_id_path" {
+  description = "Conjur secret path for Identity client ID"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_identity_client_secret_path" {
+  description = "Conjur secret path for Identity client secret"
+  type        = string
+  default     = ""
 }

@@ -14,8 +14,8 @@ variable "sia_aws_connector_1_private_ip" {}
 
 variable "windows_instance_type" {
   description = "instance type to be deployed"
-  type = string
-  default = "t3a.medium"
+  type        = string
+  default     = "t3a.medium"
 }
 variable "key_name" {
   description = "The name of the AWS key pair to use for the instance"
