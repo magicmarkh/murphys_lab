@@ -56,7 +56,7 @@ resource "idsec_sia_access_connector" "connector2" {
   connector_pool_id = "2fc8846d-2e29-4aa8-b8a2-d3b4738c8e5e"
   target_machine    = var.sia_aws_connector_2_private_ip
   username          = "ec2-user"
-  private_key_path  = "/Users/mark.hurter/Documents/Code/murphys_lab/terraform_code/03_ec2_compute/key_pair/us-ent-east-key.pem"
+  private_key_path  = "key_pair/us-ent-east-key.pem"
 
   depends_on = [aws_instance.sia_aws_connector]
 }
