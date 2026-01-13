@@ -100,7 +100,7 @@ process_terraform_code() {
         if [[ -f "${base_path}/${TFVARS_FILENAME}" ]]; then
             local temp_tfvars="${TEMP_DIR}/$(echo ${dir} | tr '/' '_')_${TFVARS_FILENAME}"
             sanitize_tfvars "${base_path}/${TFVARS_FILENAME}" "${temp_tfvars}"
-            upload_file "${temp_tfvars}" "${s3_base}/${TFVARS_FILENAME}" "tfvars"
+            upload_file "${temp_tfvars}" "${s3_base}/${TFVARS_FILENAME}" "tfvars" || true
         else
             echo "  ⊘ Local tfvars not found: ${base_path}/${TFVARS_FILENAME}"
             ((TOTAL_SKIPPED++))
@@ -108,7 +108,7 @@ process_terraform_code() {
 
         # Upload backend.tf (no sanitization needed)
         if [[ -f "${base_path}/${BACKEND_FILENAME}" ]]; then
-            upload_file "${base_path}/${BACKEND_FILENAME}" "${s3_base}/${BACKEND_FILENAME}" "backend"
+            upload_file "${base_path}/${BACKEND_FILENAME}" "${s3_base}/${BACKEND_FILENAME}" "backend" || true
         else
             echo "  ⊘ Local backend.tf not found: ${base_path}/${BACKEND_FILENAME}"
             ((TOTAL_SKIPPED++))
@@ -134,7 +134,7 @@ process_examples() {
         if [[ -f "${base_path}/${TFVARS_FILENAME}" ]]; then
             local temp_tfvars="${TEMP_DIR}/$(echo ${dir} | tr '/' '_')_${TFVARS_FILENAME}"
             sanitize_tfvars "${base_path}/${TFVARS_FILENAME}" "${temp_tfvars}"
-            upload_file "${temp_tfvars}" "${s3_base}/${TFVARS_FILENAME}" "tfvars"
+            upload_file "${temp_tfvars}" "${s3_base}/${TFVARS_FILENAME}" "tfvars" || true
         else
             echo "  ⊘ Local tfvars not found: ${base_path}/${TFVARS_FILENAME}"
             ((TOTAL_SKIPPED++))

@@ -63,7 +63,7 @@ process_terraform_code() {
         if [[ -f "${tfvars_path}" ]]; then
             echo ""
             echo "Module: terraform_code/${dir}"
-            update_tfvars_secrets "${tfvars_path}" "${conjur_login}" "${conjur_api_key}"
+            update_tfvars_secrets "${tfvars_path}" "${conjur_login}" "${conjur_api_key}" || true
         fi
     done
 }
@@ -84,7 +84,7 @@ process_examples() {
         if [[ -f "${tfvars_path}" ]]; then
             echo ""
             echo "Example: examples/${dir}"
-            update_tfvars_secrets "${tfvars_path}" "${conjur_login}" "${conjur_api_key}"
+            update_tfvars_secrets "${tfvars_path}" "${conjur_login}" "${conjur_api_key}" || true
         fi
     done
 }

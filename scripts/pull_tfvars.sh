@@ -72,10 +72,10 @@ process_terraform_code() {
         echo "Module: terraform_code/${dir}"
 
         # Download terraform.tfvars
-        download_file "${s3_base}/${TFVARS_FILENAME}" "${base_path}/${TFVARS_FILENAME}" "tfvars"
+        download_file "${s3_base}/${TFVARS_FILENAME}" "${base_path}/${TFVARS_FILENAME}" "tfvars" || true
 
         # Download backend.tf
-        download_file "${s3_base}/${BACKEND_FILENAME}" "${base_path}/${BACKEND_FILENAME}" "backend"
+        download_file "${s3_base}/${BACKEND_FILENAME}" "${base_path}/${BACKEND_FILENAME}" "backend" || true
     done
 }
 
@@ -94,7 +94,7 @@ process_examples() {
         echo "Example: examples/${dir}"
 
         # Download terraform.tfvars
-        download_file "${s3_base}/${TFVARS_FILENAME}" "${base_path}/${TFVARS_FILENAME}" "tfvars"
+        download_file "${s3_base}/${TFVARS_FILENAME}" "${base_path}/${TFVARS_FILENAME}" "tfvars" || true
     done
 }
 
