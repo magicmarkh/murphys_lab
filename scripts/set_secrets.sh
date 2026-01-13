@@ -15,7 +15,7 @@ read_secret() {
     local secret_value
 
     read -sp "${prompt}: " secret_value
-    echo ""
+    echo "" >&2  # Output newline to stderr, not stdout
     echo "${secret_value}"
 }
 
