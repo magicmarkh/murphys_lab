@@ -30,6 +30,18 @@ resource "aws_iam_role_policy" "secrets_policy" {
   policy = data.aws_iam_policy_document.secrets.json
 }
 
+data "aws_iam_policy_document" "ec2_full_access" {
+  statement {
+    actions   = ["ec2:*"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "ec2_policy" {
+  role   = aws_iam_role.ec2_asm_role.id
+  policy = data.aws_iam_policy_document.ec2_full_access.json
+}
+
 resource "aws_iam_instance_profile" "us_ent_east_ec2_asm_instance_profile" {
   name = "us-ent-east-ec2-connector-profile"
   role = aws_iam_role.ec2_asm_role.name
