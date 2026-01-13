@@ -15,10 +15,10 @@ export TFVARS_FILENAME="terraform.tfvars"
 export BACKEND_FILENAME="backend.tf"
 
 # Sensitive field patterns
-export SENSITIVE_FIELDS=("conjur_login" "conjur_api_key")
+SENSITIVE_FIELDS=("conjur_login" "conjur_api_key")
 
 # Terraform code directories to process
-export TERRAFORM_CODE_DIRS=(
+TERRAFORM_CODE_DIRS=(
     "01_foundation"
     "02_security"
     "03_ec2_compute"
@@ -32,7 +32,7 @@ export TERRAFORM_CODE_DIRS=(
 )
 
 # Example directories to process
-export EXAMPLE_DIRS=(
+EXAMPLE_DIRS=(
     "privilege_cloud"
     "identity"
     "access_policy/csp_console/aws_iam"
