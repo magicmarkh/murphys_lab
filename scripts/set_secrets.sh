@@ -23,10 +23,14 @@ read_secret() {
 read_ssh_key() {
     local ssh_key=""
 
-    echo "Paste your SSH private key below."
-    echo "The key should start with '-----BEGIN RSA PRIVATE KEY-----'"
-    echo "Paste the entire key including BEGIN and END lines, then press Ctrl+D on a new line:"
-    echo ""
+    # Send prompts to stderr so they're always visible
+    echo "Paste your SSH private key below." >&2
+    echo "The key should start with '-----BEGIN RSA PRIVATE KEY-----'" >&2
+    echo "Paste the entire key including BEGIN and END lines." >&2
+    echo "" >&2
+    echo "When done pasting, press Enter, then Ctrl+D on a new line:" >&2
+    echo "(Waiting for input...)" >&2
+    echo "" >&2
 
     # Read multi-line input until EOF (Ctrl+D)
     ssh_key=$(cat)
@@ -158,6 +162,9 @@ main() {
     read -p "> " setup_ssh_key
 
     if [[ "$setup_ssh_key" =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "Starting SSH key setup..."
+        echo ""
         ssh_key=$(read_ssh_key)
         echo ""
         update_ssh_key "$ssh_key"
