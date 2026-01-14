@@ -42,6 +42,11 @@ module "cybr_mcp_server_role" {
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
+module "ec2_s3_role" {
+  source         = "./iam_roles/ec2_s3_role"
+  s3_bucket_arn  = data.terraform_remote_state.foundation.outputs.bucket_arn
+}
+
 # NOTE: jenkins_server_role is commented out - keeping commented per current state
 # Uncomment when needed, but note: this module has a BUG - it's missing an
 # aws_iam_instance_profile resource and the output returns policy name instead

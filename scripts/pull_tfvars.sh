@@ -58,6 +58,26 @@ download_file() {
     fi
 }
 
+# Function to ensure SSH key directory exists
+ensure_ssh_key_directory() {
+    local key_dir="${REPO_ROOT}/${SSH_KEY_PATH}"
+
+    if [[ ! -d "$key_dir" ]]; then
+        echo "Creating SSH key directory: ${key_dir}"
+        mkdir -p "$key_dir"
+        if [[ $? -eq 0 ]]; then
+            echo "✓ SSH key directory created"
+        else
+            echo "✗ Failed to create SSH key directory" >&2
+            return 1
+        fi
+    else
+        echo "✓ SSH key directory already exists"
+    fi
+
+    return 0
+}
+
 # Function: Process terraform_code directories
 process_terraform_code() {
     echo ""
@@ -110,6 +130,13 @@ main() {
     echo ""
 
     check_prerequisites
+
+    # Ensure SSH key directory exists
+    echo ""
+    echo "Ensuring SSH key directory exists..."
+    ensure_ssh_key_directory || {
+        echo "Warning: Could not create SSH key directory" >&2
+    }
 
     process_terraform_code
 

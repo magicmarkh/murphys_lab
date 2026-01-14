@@ -40,3 +40,8 @@ variable "windows_instance_type" {
 variable "key_name" {
   description = "The name of the AWS key pair to use for the instance"
 }
+
+variable "ec2_s3_instance_profile_name" {
+  description = "Name of the IAM instance profile for S3 access"
+  type        = string
+}
