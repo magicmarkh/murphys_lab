@@ -1,5 +1,0 @@
-sudo yum install python3-pip -y
-sudo yum install ansible -y
-sudo yum install terraform -y
-pip3 install "pywinrm[credssp]"
-ansible-galaxy collection install community.aws --force

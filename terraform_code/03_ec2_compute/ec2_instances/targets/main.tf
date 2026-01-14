@@ -6,9 +6,9 @@ resource "aws_instance" "linux_target_1" {
   key_name                    = var.key_name
   vpc_security_group_ids      = [var.linux_security_group_ids]
   private_ip                  = var.linux_target_1_private_ip
-  iam_instance_profile        = var.ec2_asm_instance_profile_name
-
-  user_data = <<-EOF
+  disable_api_termination     = true
+  
+  user_data                   = <<-EOF
     #!/bin/bash -xe
 
     SCRIPTS_DIR=/opt/sia
@@ -25,8 +25,8 @@ resource "aws_instance" "linux_target_1" {
     #!/usr/bin/env bash
     set -xe
 
-    export AWS_REGION="${var.region}"
-    export PLATFORM_SECRET_ARN="${var.cyberark_secret_arn}"
+    export IDENTITY_CLIENT_ID="${var.identity_client_id}"
+    export IDENTITY_CLIENT_SECRET="${var.identity_client_secret}"
     export IDENTITY_TENANT_ID="${var.identity_tenant_id}"
     export PLATFORM_TENANT_NAME="${var.platform_tenant_name}"
     export WORKSPACE_ID="${var.workspace_id}"
@@ -50,6 +50,7 @@ resource "aws_instance" "linux_target_1" {
 
   lifecycle {
     ignore_changes = [tags, ami]
+    prevent_destroy = true
   }
 }
 
@@ -62,6 +63,7 @@ resource "aws_instance" "target_windows_server" {
   key_name                    = var.key_name
   vpc_security_group_ids      = var.windows_security_group_ids
   private_ip                  = var.windows_target_1_private_ip
+  disable_api_termination     = true
 
   root_block_device {
     volume_size = 50
@@ -78,5 +80,6 @@ resource "aws_instance" "target_windows_server" {
 
   lifecycle {
     ignore_changes = [tags]
+    prevent_destroy = true
   }
 }

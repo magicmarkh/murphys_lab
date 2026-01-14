@@ -23,6 +23,26 @@ data "aws_ami" "amazon_linux_latest" {
   }
 }
 
+data "aws_ami" "windows_2022_latest" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
 # =====================================================================
 # REMOTE STATE - Foundation Layer
 # =====================================================================
@@ -55,6 +75,9 @@ data "terraform_remote_state" "security" {
 locals {
   # Use latest Amazon Linux AMI from data source if variable is null
   linux_ami_id = var.amzn_linux_ami_id != null ? var.amzn_linux_ami_id : data.aws_ami.amazon_linux_latest.id
+
+  # Use latest Windows Server 2022 AMI from data source if variable is null
+  windows_ami_id = var.amzn_windows_server_ami_id != null ? var.amzn_windows_server_ami_id : data.aws_ami.windows_2022_latest.id
 }
 
 # =====================================================================
@@ -75,6 +98,7 @@ module "dc" {
   vpc_id             = data.terraform_remote_state.foundation.outputs.vpc_id
   team_name          = var.team_name
   asset_owner_name   = var.asset_owner_name
+  windows_ami_id     = local.windows_ami_id
   key_name           = module.key_pair.key_name
   iScheduler         = var.iScheduler
   security_group_ids = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.domain_controller_sg_id]
@@ -87,7 +111,7 @@ module "cyberark_connectors" {
   vpc_id           = data.terraform_remote_state.foundation.outputs.vpc_id
   team_name        = var.team_name
   asset_owner_name = var.asset_owner_name
-  windows_ami_id   = var.amzn_windows_server_ami_id
+  windows_ami_id   = local.windows_ami_id
   key_name         = module.key_pair.key_name
   iScheduler       = var.iScheduler
   windows_security_group_ids = [
@@ -98,7 +122,7 @@ module "cyberark_connectors" {
   connector_1_private_ip         = var.connector_1_private_ip
   sia_aws_connector_1_private_ip = var.sia_aws_connector_1_private_ip
 }
-
+/*
 module "aws_sia_connector" {
   source                         = "./ec2_instances/aws_sia_connector"
   private_subnet_id              = data.terraform_remote_state.foundation.outputs.private_subnet_id
@@ -136,27 +160,27 @@ module "aws_sia_connector2" {
   platform_tenant_name           = var.platform_tenant_name
   ec2_asm_instance_profile_name  = data.terraform_remote_state.security.outputs.ec2_asm_instance_profile_name
 }
-
+*/
 module "targets" {
-  source                        = "./ec2_instances/targets"
-  vpc_id                        = data.terraform_remote_state.foundation.outputs.vpc_id
-  team_name                     = var.team_name
-  asset_owner_name              = var.asset_owner_name
-  key_name                      = module.key_pair.key_name
-  iScheduler                    = var.iScheduler
-  linux_ami_id                  = local.linux_ami_id
-  windows_security_group_ids    = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.sia_windows_target_sg_id]
-  linux_security_group_ids      = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
-  private_subnet_id             = data.terraform_remote_state.foundation.outputs.private_subnet_id
-  windows_target_1_private_ip   = var.windows_target_1_private_ip
-  linux_target_1_private_ip     = var.linux_target_1_private_ip
-  region                        = var.region
-  cyberark_secret_arn           = var.cyberark_secret_arn
-  identity_tenant_id            = var.identity_tenant_id
-  platform_tenant_name          = var.platform_tenant_name
-  workspace_id                  = data.aws_caller_identity.current.account_id
-  workspace_type                = var.workspace_type
-  linux_target_1_hostname       = var.linux_target_1_hostname
-  ec2_asm_instance_profile_name = data.terraform_remote_state.security.outputs.ec2_asm_instance_profile_name
-  windows_ami_id                = var.amzn_windows_server_ami_id
+  source                      = "./ec2_instances/targets"
+  vpc_id                      = data.terraform_remote_state.foundation.outputs.vpc_id
+  team_name                   = var.team_name
+  asset_owner_name            = var.asset_owner_name
+  key_name                    = module.key_pair.key_name
+  iScheduler                  = var.iScheduler
+  linux_ami_id                = local.linux_ami_id
+  windows_security_group_ids  = [data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id, data.terraform_remote_state.foundation.outputs.sia_windows_target_sg_id]
+  linux_security_group_ids    = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
+  private_subnet_id           = data.terraform_remote_state.foundation.outputs.private_subnet_id
+  windows_target_1_private_ip = var.windows_target_1_private_ip
+  linux_target_1_private_ip   = var.linux_target_1_private_ip
+  region                      = var.region
+  identity_tenant_id          = var.identity_tenant_id
+  platform_tenant_name        = var.platform_tenant_name
+  workspace_id                = data.aws_caller_identity.current.account_id
+  workspace_type              = var.workspace_type
+  linux_target_1_hostname     = var.linux_target_1_hostname
+  identity_client_id          = data.conjur_secret.identity_client_id.value
+  identity_client_secret      = data.conjur_secret.identity_client_secret.value
+  windows_ami_id              = local.windows_ami_id
 }

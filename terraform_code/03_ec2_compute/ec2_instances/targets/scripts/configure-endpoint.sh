@@ -12,7 +12,7 @@ if (( EUID != 0 )); then
 fi
 
 # ── Check for required tools ──────────────────────────────────────────────────
-for cmd in aws jq curl; do
+for cmd in jq curl; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "[register] ERROR: '$cmd' not installed" >&2
     exit 1
@@ -20,8 +20,8 @@ for cmd in aws jq curl; do
 done
 
 # ── Validate required environment variables ──────────────────────────────────
-: "${AWS_REGION:?AWS_REGION is required}"
-: "${PLATFORM_SECRET_ARN:?PLATFORM_SECRET_ARN is required}"
+: "${IDENTITY_CLIENT_ID:?IDENTITY_CLIENT_ID is required}"
+: "${IDENTITY_CLIENT_SECRET:?IDENTITY_CLIENT_SECRET is required}"
 : "${IDENTITY_TENANT_ID:?IDENTITY_TENANT_ID is required}"
 : "${PLATFORM_TENANT_NAME:?PLATFORM_TENANT_NAME is required}"
 : "${WORKSPACE_ID:?WORKSPACE_ID is required}"
@@ -36,15 +36,10 @@ fi
 {
   echo "[$(date)] [register] Starting target configuration"
 
-  # 1) Fetch CyberArk platform credentials
-  echo "[$(date)] [register] Fetching platform creds from Secrets Manager"
-  secret_json=$(aws secretsmanager get-secret-value \
-    --region "$AWS_REGION" \
-    --secret-id "$PLATFORM_SECRET_ARN" \
-    --query SecretString --output text)
-
-  client_id=$(jq -r '.username' <<<"$secret_json")
-  client_secret=$(jq -r '.password' <<<"$secret_json")
+  # 1) Use CyberArk platform credentials from environment
+  echo "[$(date)] [register] Using platform credentials from environment"
+  client_id="$IDENTITY_CLIENT_ID"
+  client_secret="$IDENTITY_CLIENT_SECRET"
 
   # 2) Obtain OAuth token 
   IDENTITY_URL="https://${IDENTITY_TENANT_ID}.id.cyberark.cloud"
@@ -98,7 +93,7 @@ fi
   curl -sk -X POST "${IDENTITY_URL}/security/logout" \
        -H "Authorization: Bearer ${platform_token}" || true
 
-  echo "[$(date)] [register] Connector registration completed successfully"
+  echo "[$(date)] [register]Target registration completed successfully"
 } 2>&1 | tee -a "$LOG"
 
 # Mark done

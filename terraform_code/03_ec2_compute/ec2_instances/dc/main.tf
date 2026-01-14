@@ -6,6 +6,7 @@ resource "aws_instance" "us-ent-east-dc1" {
   key_name                    = var.key_name
   vpc_security_group_ids      = var.security_group_ids
   private_ip                  = var.private_ip
+  disable_api_termination     = true
 
   root_block_device {
     volume_size = 50
@@ -22,5 +23,6 @@ resource "aws_instance" "us-ent-east-dc1" {
 
   lifecycle {
     ignore_changes = [tags]
+    prevent_destroy = true
   }
 }

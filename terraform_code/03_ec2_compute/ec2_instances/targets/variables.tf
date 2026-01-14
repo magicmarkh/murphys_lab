@@ -10,13 +10,22 @@ variable "windows_security_group_ids" {}
 variable "windows_target_1_private_ip" {}
 variable "linux_target_1_private_ip" {}
 variable "region" {}
-variable "cyberark_secret_arn" {}
 variable "identity_tenant_id" {}
 variable "platform_tenant_name" {}
 variable "workspace_id" {}
 variable "workspace_type" {}
 variable "linux_target_1_hostname" {}
-variable "ec2_asm_instance_profile_name" {}
+variable "identity_client_id" {
+  description = "CyberArk Identity client ID (username) for OAuth authentication"
+  type        = string
+  sensitive   = true
+}
+
+variable "identity_client_secret" {
+  description = "CyberArk Identity client secret (password) for OAuth authentication"
+  type        = string
+  sensitive   = true
+}
 variable "linux_instance_type" {
   description = "instance type to be deployed"
   type        = string

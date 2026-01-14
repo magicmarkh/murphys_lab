@@ -22,9 +22,9 @@ variable "amzn_linux_ami_id" {
 }
 
 variable "amzn_windows_server_ami_id" {
-  description = "ami id for amazon windows ec2"
+  description = "ami id for amazon windows ec2 - defaults to latest Windows Server 2022"
   type        = string
-  default     = "ami-0f92a5908d7b0f379"
+  default     = null
 }
 
 variable "iScheduler" {
@@ -65,11 +65,6 @@ variable "sia_aws_connector_2_private_ip" {
 
 variable "connector_pool_name" {
   description = "Name of the connector pool you're adding the connector to"
-  type        = string
-}
-
-variable "cyberark_secret_arn" {
-  description = "arn of the identity service account. Used if retrieving the service account from ASM."
   type        = string
 }
 
