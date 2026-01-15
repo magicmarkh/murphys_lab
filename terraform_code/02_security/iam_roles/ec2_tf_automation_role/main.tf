@@ -50,6 +50,20 @@ resource "aws_iam_role_policy" "secrets_policy" {
   policy = data.aws_iam_policy_document.secrets.json
 }
 
+# IAM full access policy
+data "aws_iam_policy_document" "iam_access" {
+  statement {
+    actions   = ["iam:*"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "iam_policy" {
+  name   = "${var.ec2_tf_automation_role_name}-iam-policy"
+  role   = aws_iam_role.ec2_tf_automation_role.id
+  policy = data.aws_iam_policy_document.iam_access.json
+}
+
 # S3 bucket access policy
 data "aws_iam_policy_document" "s3_access" {
   statement {
