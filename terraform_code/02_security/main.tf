@@ -14,16 +14,6 @@ data "terraform_remote_state" "foundation" {
 }
 
 # =====================================================================
-# SECRETS MANAGER
-# =====================================================================
-module "aws_sm_secrets" {
-  source                  = "./aws_sm_secrets"
-  domain_join_password    = var.domain_join_password
-  domain_join_secret_name = var.domain_join_secret_name
-  domain_join_username    = var.domain_join_username
-}
-
-# =====================================================================
 # IAM ROLES
 # =====================================================================
 module "secrets_hub_onboarding_role" {

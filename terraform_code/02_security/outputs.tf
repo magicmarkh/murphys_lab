@@ -1,10 +1,10 @@
 # ===========================
 # Secrets Manager Outputs
 # ===========================
-output "domain_join_secret_arn" {
+/*output "domain_join_secret_arn" {
   description = "ARN of the domain join Secrets Manager secret"
   value       = module.aws_sm_secrets.secret_arn
-}
+}*/
 
 # ===========================
 # IAM Role Outputs
