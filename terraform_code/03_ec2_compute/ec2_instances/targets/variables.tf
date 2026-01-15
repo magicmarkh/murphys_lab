@@ -41,7 +41,7 @@ variable "key_name" {
   description = "The name of the AWS key pair to use for the instance"
 }
 
-variable "ec2_s3_instance_profile_name" {
-  description = "Name of the IAM instance profile for S3 access"
+variable "ec2_tf_automation_instance_profile_name" {
+  description = "Name of the IAM instance profile for Terraform automation"
   type        = string
 }

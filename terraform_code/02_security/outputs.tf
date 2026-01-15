@@ -40,24 +40,24 @@ output "secrets_hub_onboarding_role_arn" {
   sensitive   = true
 }
 
-output "ec2_s3_instance_profile_name" {
-  description = "Name of the EC2 S3 instance profile"
-  value       = module.ec2_s3_role.instance_profile_name
+output "ec2_tf_automation_instance_profile_name" {
+  description = "Name of the EC2 Terraform automation instance profile"
+  value       = module.ec2_tf_automation_role.instance_profile_name
 }
 
-output "ec2_s3_instance_profile_arn" {
-  description = "ARN of the EC2 S3 instance profile"
-  value       = module.ec2_s3_role.instance_profile_arn
+output "ec2_tf_automation_instance_profile_arn" {
+  description = "ARN of the EC2 Terraform automation instance profile"
+  value       = module.ec2_tf_automation_role.instance_profile_arn
 }
 
-output "ec2_s3_role_arn" {
-  description = "ARN of the EC2 S3 IAM role"
-  value       = module.ec2_s3_role.role_arn
+output "ec2_tf_automation_role_arn" {
+  description = "ARN of the EC2 Terraform automation IAM role"
+  value       = module.ec2_tf_automation_role.role_arn
 }
 
-output "ec2_s3_role_name" {
-  description = "Name of the EC2 S3 IAM role"
-  value       = module.ec2_s3_role.role_name
+output "ec2_tf_automation_role_name" {
+  description = "Name of the EC2 Terraform automation IAM role"
+  value       = module.ec2_tf_automation_role.role_name
 }
 
 # NOTE: jenkins_server_role outputs would go here when uncommented

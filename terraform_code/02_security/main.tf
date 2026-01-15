@@ -42,8 +42,8 @@ module "cybr_mcp_server_role" {
   cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
-module "ec2_s3_role" {
-  source         = "./iam_roles/ec2_s3_role"
+module "ec2_tf_automation_role" {
+  source         = "./iam_roles/ec2_tf_automation_role"
   s3_bucket_arn  = data.terraform_remote_state.foundation.outputs.bucket_arn
 }
 

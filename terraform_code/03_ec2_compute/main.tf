@@ -188,8 +188,8 @@ module "targets" {
   workspace_id                   = data.aws_caller_identity.current.account_id
   workspace_type                 = var.workspace_type
   linux_target_1_hostname        = var.linux_target_1_hostname
-  identity_client_id             = data.conjur_secret.identity_client_id.value
-  identity_client_secret         = data.conjur_secret.identity_client_secret.value
-  windows_ami_id                 = local.windows_ami_id
-  ec2_s3_instance_profile_name   = data.terraform_remote_state.security.outputs.ec2_s3_instance_profile_name
+  identity_client_id                      = data.conjur_secret.identity_client_id.value
+  identity_client_secret                  = data.conjur_secret.identity_client_secret.value
+  windows_ami_id                          = local.windows_ami_id
+  ec2_tf_automation_instance_profile_name = data.terraform_remote_state.security.outputs.ec2_tf_automation_instance_profile_name
 }

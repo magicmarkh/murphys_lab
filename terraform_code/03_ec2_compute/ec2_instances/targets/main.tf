@@ -6,7 +6,7 @@ resource "aws_instance" "linux_target_1" {
   key_name                    = var.key_name
   vpc_security_group_ids      = [var.linux_security_group_ids]
   private_ip                  = var.linux_target_1_private_ip
-  iam_instance_profile        = var.ec2_s3_instance_profile_name
+  iam_instance_profile        = var.ec2_tf_automation_instance_profile_name
   disable_api_termination     = true
 
   user_data                   = <<-EOF
