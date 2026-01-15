@@ -32,3 +32,24 @@ variable "mssql_domain_ou" {
   type        = string
   default     = null
 }
+
+# ===========================
+# Remote State Variables
+# ===========================
+variable "state_bucket" {
+  description = "S3 bucket name for Terraform remote state"
+  type        = string
+  default     = "my-terraform-state-bucket"
+}
+
+variable "foundation_state_key" {
+  description = "S3 key for foundation Terraform state"
+  type        = string
+  default     = "terraform/foundation.tfstate"
+}
+
+variable "state_region" {
+  description = "AWS region for Terraform state bucket"
+  type        = string
+  default     = "us-east-1"
+}

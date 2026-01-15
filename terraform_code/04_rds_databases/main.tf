@@ -7,9 +7,9 @@ data "terraform_remote_state" "foundation" {
   backend = "s3"
 
   config = {
-    bucket = "us-ent-east"
-    key    = "terraform/foundation.tfstate"
-    region = "us-east-2"
+    bucket = var.state_bucket
+    key    = var.foundation_state_key
+    region = var.state_region
   }
 }
 

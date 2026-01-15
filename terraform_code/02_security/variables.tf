@@ -49,3 +49,24 @@ variable "cyberark_secret_arn" {
   description = "ARN of the identity service account. Used if retrieving the service account from ASM."
   type        = string
 }
+
+# ===========================
+# Remote State Variables
+# ===========================
+variable "state_bucket" {
+  description = "S3 bucket name for Terraform remote state"
+  type        = string
+  default     = "my-terraform-state-bucket"
+}
+
+variable "foundation_state_key" {
+  description = "S3 key for foundation Terraform state"
+  type        = string
+  default     = "terraform/foundation.tfstate"
+}
+
+variable "state_region" {
+  description = "AWS region for Terraform state bucket"
+  type        = string
+  default     = "us-east-1"
+}

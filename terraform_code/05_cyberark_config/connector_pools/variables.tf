@@ -74,3 +74,30 @@ variable "ad_domain_name" {
   type = string
   default = "acme.com"
 }
+
+variable "rds_domain_name" {
+  description = "domain for rds instances"
+  type = string
+  default = "abc123.us-east-1.rds.amazonaws.com"
+}
+
+# ===========================
+# Remote State Variables
+# ===========================
+variable "state_bucket" {
+  description = "S3 bucket name for Terraform remote state"
+  type        = string
+  default     = "my-terraform-state-bucket"
+}
+
+variable "foundation_state_key" {
+  description = "S3 key for foundation Terraform state"
+  type        = string
+  default     = "terraform/foundation.tfstate"
+}
+
+variable "state_region" {
+  description = "AWS region for Terraform state bucket"
+  type        = string
+  default     = "us-east-1"
+}

@@ -3,9 +3,11 @@ data "aws_caller_identity" "current" {}
 
 # Data source to reference infrastructure outputs
 data "terraform_remote_state" "foundation" {
-  backend = "local"
+  backend = "s3"
   config = {
-    path = "../../01_foundation/terraform.tfstate"
+    bucket = var.state_bucket
+    key    = var.foundation_state_key
+    region = var.state_region
   }
 }
 
@@ -17,7 +19,7 @@ locals {
       type  = "GENERAL_FQDN"
     }
     "AWSRdsDomain" = {
-      value = "*.clv2dmjtgp2g.us-east-2.rds.amazonaws.com"
+      value = "*.${var.rds_domain_name}"
       type  = "GENERAL_FQDN"
     }
     "aws_vpc" = {
@@ -36,13 +38,17 @@ locals {
       value = var.ad_domain_name
       type  = "GENERAL_FQDN"
     }
+    "active_directory_domain_subtargets" = {
+      value = "*.${var.ad_domain_name}"
+      type  = "GENERAL_FQDN"
+    }
   }
 }
 
 resource "idsec_cmgr_network" "networks" {
   for_each = toset(var.networks)
 
-  name     = each.value
+  name = each.value
 }
 
 resource "idsec_cmgr_pool" "main" {
