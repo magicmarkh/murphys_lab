@@ -43,8 +43,9 @@ module "cybr_mcp_server_role" {
 }
 
 module "ec2_tf_automation_role" {
-  source         = "./iam_roles/ec2_tf_automation_role"
-  s3_bucket_arn  = data.terraform_remote_state.foundation.outputs.bucket_arn
+  source              = "./iam_roles/ec2_tf_automation_role"
+  s3_bucket_arn       = data.terraform_remote_state.foundation.outputs.bucket_arn
+  cyberark_secret_arn = [var.cyberark_secret_arn]
 }
 
 # NOTE: jenkins_server_role is commented out - keeping commented per current state

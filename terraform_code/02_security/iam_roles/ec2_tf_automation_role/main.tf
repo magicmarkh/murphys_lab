@@ -32,6 +32,24 @@ resource "aws_iam_role_policy" "ec2_policy" {
   policy = data.aws_iam_policy_document.ec2_access.json
 }
 
+# Secrets Manager access policy
+data "aws_iam_policy_document" "secrets" {
+  statement {
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = var.cyberark_secret_arn
+  }
+}
+
+resource "aws_iam_role_policy" "secrets_policy" {
+  name   = "${var.ec2_tf_automation_role_name}-secrets-policy"
+  role   = aws_iam_role.ec2_tf_automation_role.id
+  policy = data.aws_iam_policy_document.secrets.json
+}
+
 # S3 bucket access policy
 data "aws_iam_policy_document" "s3_access" {
   statement {
