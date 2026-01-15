@@ -44,9 +44,9 @@ variable "conjur_identity_client_secret_path" {
 # ===========================
 # Connector Manager Variables
 # ===========================
-variable "network_name" {
-  description = "Name of the connector network"
-  type        = string
+variable "networks" {
+  description = "List of connector network names to create"
+  type        = list(string)
 }
 
 variable "pool_name" {
@@ -69,8 +69,8 @@ variable "tags" {
   default = {}
 }
 
-variable "pool_identifiers" {
-  description = "List of identifiers to add to the connector manager pool"
-  type        = list(string)
-  default     = []
+variable "ad_domain_name" {
+  description = "name of the AD Domain to integrate"
+  type = string
+  default = "acme.com"
 }

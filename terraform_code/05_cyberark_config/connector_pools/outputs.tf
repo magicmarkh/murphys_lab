@@ -1,11 +1,11 @@
-output "connector_network_id" {
-  description = "ID of the connector network"
-  value       = idsec_cmgr_network.main.network_id
+output "connector_network_ids" {
+  description = "Map of connector network IDs"
+  value       = { for k, v in idsec_cmgr_network.networks : k => v.network_id }
 }
 
-output "connector_network_name" {
-  description = "Name of the connector network"
-  value       = idsec_cmgr_network.main.name
+output "connector_network_names" {
+  description = "Map of connector network names"
+  value       = { for k, v in idsec_cmgr_network.networks : k => v.name }
 }
 
 output "connector_manager_pool_id" {
