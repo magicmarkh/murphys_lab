@@ -122,6 +122,13 @@ module "cyberark_connectors" {
   private_subnet_id              = data.terraform_remote_state.foundation.outputs.private_subnet_id
   connector_1_private_ip         = var.connector_1_private_ip
   sia_aws_connector_1_private_ip = var.sia_aws_connector_1_private_ip
+
+  # Linux connector variables
+  linux_ami_id                   = local.linux_ami_id
+  linux_security_group_ids       = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
+  sia_linux_private_ip           = var.sia_aws_connector_2_private_ip
+  private_key_path               = module.key_pair.private_key_path
+  hostname                       = "us-ent-east-sia-aws-connector-2"
 }
 /*
 module "aws_sia_connector" {

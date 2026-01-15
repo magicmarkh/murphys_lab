@@ -19,60 +19,6 @@ read_secret() {
     echo "${secret_value}"
 }
 
-# Function to read multi-line SSH private key from user
-read_ssh_key() {
-    local ssh_key=""
-
-    # Send prompts to stderr so they're always visible
-    echo "Paste your SSH private key below." >&2
-    echo "The key should start with '-----BEGIN RSA PRIVATE KEY-----'" >&2
-    echo "Paste the entire key including BEGIN and END lines." >&2
-    echo "" >&2
-    echo "When done pasting, press Enter, then Ctrl+D on a new line:" >&2
-    echo "(Waiting for input...)" >&2
-    echo "" >&2
-
-    # Read multi-line input until EOF (Ctrl+D)
-    ssh_key=$(cat)
-
-    echo "$ssh_key"
-}
-
-# Function to update SSH key file
-update_ssh_key() {
-    local ssh_key="$1"
-    local key_file="${REPO_ROOT}/${SSH_KEY_PATH}/${SSH_KEY_FILENAME}"
-
-    # Check if key content is provided
-    if [[ -z "$ssh_key" ]]; then
-        echo "✗ No SSH key provided, skipping..." >&2
-        return 1
-    fi
-
-    # Validate key format (basic check for BEGIN line)
-    if ! echo "$ssh_key" | grep -q "BEGIN.*PRIVATE KEY"; then
-        echo "✗ Invalid SSH key format (missing BEGIN line)" >&2
-        return 1
-    fi
-
-    # Create directory if it doesn't exist
-    mkdir -p "$(dirname "$key_file")"
-
-    # Write key to file
-    echo "$ssh_key" > "$key_file"
-
-    if [[ $? -eq 0 ]]; then
-        # Set correct permissions (readable only by owner)
-        chmod 600 "$key_file"
-        echo "✓ SSH key written to: ${key_file}"
-        echo "✓ Permissions set to 600"
-        return 0
-    else
-        echo "✗ Failed to write SSH key to file" >&2
-        return 1
-    fi
-}
-
 # Function: Update tfvars file with secrets
 update_tfvars_secrets() {
     local file_path="$1"
@@ -151,32 +97,6 @@ main() {
     echo ""
     echo "This script will populate conjur_login and conjur_api_key"
     echo "in all terraform.tfvars files that have empty values."
-    echo ""
-
-    # Prompt for SSH key (optional)
-    echo "=========================================="
-    echo "SSH Key Setup"
-    echo "=========================================="
-    echo ""
-    echo "Do you want to set up the SSH private key? (y/n)"
-    read -p "> " setup_ssh_key
-
-    if [[ "$setup_ssh_key" =~ ^[Yy]$ ]]; then
-        echo ""
-        echo "Starting SSH key setup..."
-        echo ""
-        ssh_key=$(read_ssh_key)
-        echo ""
-        update_ssh_key "$ssh_key"
-        echo ""
-    else
-        echo "Skipping SSH key setup..."
-        echo ""
-    fi
-
-    echo "=========================================="
-    echo "Conjur Credentials Setup"
-    echo "=========================================="
     echo ""
 
     # Read secrets from user

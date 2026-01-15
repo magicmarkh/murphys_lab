@@ -21,3 +21,42 @@ variable "key_name" {
   description = "The name of the AWS key pair to use for the instance"
 }
 
+# ===========================
+# Linux Connector Variables
+# ===========================
+variable "linux_ami_id" {
+  description = "AMI ID for Linux connector instance"
+  type        = string
+}
+
+variable "linux_ami_id_instance_type" {
+  description = "Instance type for Linux connector"
+  type        = string
+  default     = "t3a.medium"
+}
+
+variable "linux_security_group_ids" {
+  description = "Security group ID for Linux connector"
+  type        = string
+}
+
+variable "sia_linux_private_ip" {
+  description = "Private IP address for SIA Linux connector"
+  type        = string
+}
+
+#variable "instance_profile_name" {
+#  description = "IAM instance profile name for ASM access"
+#  type        = string#
+#}
+
+variable "hostname" {
+  description = "Hostname for the Linux connector instance"
+  type        = string
+  default     = "us-ent-east-sia-aws-connector-2"
+}
+
+variable "private_key_path" {
+  description = "Path to the private key file for SSH access"
+  type        = string
+}

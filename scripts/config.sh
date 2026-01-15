@@ -17,11 +17,6 @@ export BACKEND_FILENAME="backend.tf"
 # Sensitive field patterns
 SENSITIVE_FIELDS=("conjur_login" "conjur_api_key")
 
-# SSH Key Configuration
-SSH_KEY_PATH="terraform_code/03_ec2_compute/key_pair"
-SSH_KEY_FILENAME="us-ent-east-key.pem"
-export SSH_KEY_PATH SSH_KEY_FILENAME
-
 # Terraform code directories to process
 TERRAFORM_CODE_DIRS=(
     "01_foundation"
