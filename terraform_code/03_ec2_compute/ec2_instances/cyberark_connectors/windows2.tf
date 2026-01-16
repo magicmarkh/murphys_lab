@@ -51,7 +51,7 @@ resource "null_resource" "join_domain" {
 
   provisioner "local-exec" {
     command = <<EOT
-cd ../ansible && ansible-playbook \
+cd ../../ansible && ansible-playbook \
   -i '${aws_instance.connector_3.private_ip},' \
   -e 'ansible_user=Administrator' \
   -e 'ansible_password=${random_password.local_admin_password.result}' \
