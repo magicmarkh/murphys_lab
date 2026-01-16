@@ -70,7 +70,7 @@ EOT
 
 resource "idsec_sia_access_connector" "windows_connector" {
   connector_type    = "AWS"
-  connector_os      = "linux"
+  connector_os      = "windows"
   connector_pool_id = "2fc8846d-2e29-4aa8-b8a2-d3b4738c8e5e"
   target_machine    = "192.168.20.27"
   username          = "Administrator"

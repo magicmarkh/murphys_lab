@@ -3,16 +3,7 @@
     timeout: 300
     delay: 15
 
-- name: Rename computer
-  win_hostname:
-    name: "{{ hostname }}"
-  register: rename_result
-
-- name: Reboot if hostname changed
-  win_reboot:
-  when: rename_result.reboot_required
-
-- name: Join domain
+- name: Rename computer and join domain
   win_domain_membership:
     dns_domain_name: "{{ domain_name }}"
     hostname: "{{ hostname }}"
