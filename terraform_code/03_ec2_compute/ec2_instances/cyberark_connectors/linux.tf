@@ -41,9 +41,9 @@ resource "aws_instance" "sia_linux_aws_connector" {
 resource "idsec_sia_access_connector" "linux_connector" {
   connector_type    = "AWS"
   connector_os      = "linux"
-  connector_pool_id = "2fc8846d-2e29-4aa8-b8a2-d3b4738c8e5e"
+  connector_pool_id = var.connector_pool_id
   target_machine    = var.sia_linux_private_ip
   username          = "ec2-user"
   private_key_path  = var.private_key_path
-  depends_on = [aws_instance.sia_linux_aws_connector]
+  depends_on        = [aws_instance.sia_linux_aws_connector]
 }

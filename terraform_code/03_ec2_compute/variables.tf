@@ -173,6 +173,12 @@ variable "security_state_key" {
   default     = "terraform/security.tfstate"
 }
 
+variable "cyberark_connector_pools_state_key" {
+  description = "S3 key for CyberArk connector pools Terraform state"
+  type        = string
+  default     = "terraform/cyberark_connector_pools.tfstate"
+}
+
 variable "state_region" {
   description = "AWS region for Terraform state bucket"
   type        = string

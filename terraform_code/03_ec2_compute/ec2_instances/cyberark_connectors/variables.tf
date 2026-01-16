@@ -5,6 +5,10 @@ variable "asset_owner_name" {}
 variable "windows_ami_id" {}
 variable "iScheduler" {}
 variable "domain_name" {}
+variable "connector_pool_id" {
+  description = "CyberArk connector manager pool ID"
+  type        = string
+}
 
 variable "windows_security_group_ids" {
   description = "List of security group IDs to attach to the instances"
