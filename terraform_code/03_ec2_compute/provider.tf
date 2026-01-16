@@ -31,15 +31,6 @@ provider "conjur" {
   login         = var.conjur_login
 }
 
-# Retrieve CyberArk Identity credentials from Conjur
-data "conjur_secret" "identity_client_id" {
-  name = var.conjur_identity_client_id_path
-}
-
-data "conjur_secret" "identity_client_secret" {
-  name = var.conjur_identity_client_secret_path
-}
-
 # =====================================================================
 # CyberArk Identity Security Provider
 # =====================================================================
