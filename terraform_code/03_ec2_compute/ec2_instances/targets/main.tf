@@ -50,7 +50,7 @@ resource "aws_instance" "linux_target_1" {
   }
 
   lifecycle {
-    ignore_changes = [tags, ami]
+    ignore_changes = [tags, ami, user_data]
     prevent_destroy = true
   }
 }
