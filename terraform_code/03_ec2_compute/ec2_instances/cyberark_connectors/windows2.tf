@@ -76,5 +76,5 @@ resource "idsec_sia_access_connector" "windows_connector" {
   username          = "Administrator"
   password  = var.domain_join_password
   depends_on = [aws_instance.connector_3]
-  winrm_protocol = "HTTP"
+  winrm_protocol = "http"
 }
