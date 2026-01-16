@@ -49,12 +49,20 @@ resource "idsec_cmgr_network" "networks" {
   for_each = toset(var.networks)
 
   name = each.value
+
+    lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "idsec_cmgr_pool" "main" {
   name                 = var.pool_name
   description          = var.pool_description
   assigned_network_ids = [for network in idsec_cmgr_network.networks : network.network_id]
+
+    lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "idsec_cmgr_pool_identifier" "identifiers" {
@@ -63,4 +71,9 @@ resource "idsec_cmgr_pool_identifier" "identifiers" {
   value   = each.value.value
   pool_id = idsec_cmgr_pool.main.pool_id
   type    = each.value.type
+
+
+    lifecycle {
+    prevent_destroy = true
+  }
 }
