@@ -117,7 +117,8 @@ module "cyberark_connectors" {
   windows_security_group_ids = [
     data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id,
     data.terraform_remote_state.foundation.outputs.https_internal_flat_sg_id,
-    data.terraform_remote_state.foundation.outputs.sia_windows_target_sg_id
+    data.terraform_remote_state.foundation.outputs.sia_windows_target_sg_id,
+    data.terraform_remote_state.foundation.outputs.winrm_internal_flat_sg_id
   ]
   private_subnet_id              = data.terraform_remote_state.foundation.outputs.private_subnet_id
   connector_1_private_ip         = var.connector_1_private_ip

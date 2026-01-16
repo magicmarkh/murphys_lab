@@ -1,0 +1,92 @@
+---
+# Tasks to set up a Terraform automation host on Amazon Linux 2023
+# Installs Python3, Ansible, pywinrm, and Terraform
+
+- name: Update dnf package cache
+  ansible.builtin.dnf:
+    update_cache: yes
+  become: yes
+
+- name: Install Python 3 and pip
+  ansible.builtin.dnf:
+    name:
+      - python3
+      - python3-pip
+    state: present
+  become: yes
+
+- name: Upgrade pip to latest version
+  ansible.builtin.pip:
+    name: pip
+    state: latest
+    executable: pip3
+  become: yes
+
+- name: Install Ansible via pip
+  ansible.builtin.pip:
+    name: ansible
+    state: present
+    executable: pip3
+  become: yes
+
+- name: Install pywinrm for Windows host management
+  ansible.builtin.pip:
+    name:
+      - pywinrm
+      - pywinrm[credssp]
+    state: present
+    executable: pip3
+  become: yes
+
+- name: Install additional Python dependencies
+  ansible.builtin.pip:
+    name:
+      - boto3
+      - botocore
+    state: present
+    executable: pip3
+  become: yes
+
+- name: Add HashiCorp yum repository
+  ansible.builtin.yum_repository:
+    name: hashicorp
+    description: HashiCorp Stable - $basearch
+    baseurl: https://rpm.releases.hashicorp.com/AmazonLinux/2023/$basearch/stable
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+  become: yes
+
+- name: Install Terraform
+  ansible.builtin.dnf:
+    name: terraform
+    state: present
+  become: yes
+
+- name: Verify Python installation
+  ansible.builtin.command: python3 --version
+  register: python_version
+  changed_when: false
+
+- name: Verify Ansible installation
+  ansible.builtin.command: ansible --version
+  register: ansible_version
+  changed_when: false
+
+- name: Verify Terraform installation
+  ansible.builtin.command: terraform --version
+  register: terraform_version
+  changed_when: false
+
+- name: Verify pywinrm installation
+  ansible.builtin.command: python3 -c "import winrm; print('pywinrm installed')"
+  register: pywinrm_check
+  changed_when: false
+
+- name: Display installation results
+  ansible.builtin.debug:
+    msg:
+      - "Python: {{ python_version.stdout }}"
+      - "Ansible: {{ ansible_version.stdout_lines[0] }}"
+      - "Terraform: {{ terraform_version.stdout_lines[0] }}"
+      - "pywinrm: {{ pywinrm_check.stdout }}"

@@ -1,0 +1,45 @@
+---
+# Playbook to set up an Amazon Linux 2023 instance as a Terraform automation host
+# Installs: Python3, Ansible, pywinrm, Terraform
+#
+# Usage:
+#   ansible-playbook -i '<host-ip>,' -e 'ansible_user=ec2-user' \
+#     --private-key=/path/to/key.pem playbooks/setup_al2023_terraform_host.yml
+#
+# For localhost setup:
+#   ansible-playbook -i 'localhost,' -c local playbooks/setup_al2023_terraform_host.yml
+
+- name: Setup AL2023 Terraform Automation Host
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Verify running on Amazon Linux 2023
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Amazon"
+          - ansible_distribution_major_version == "2023"
+        fail_msg: "This playbook is designed for Amazon Linux 2023 only"
+        success_msg: "Confirmed running on Amazon Linux 2023"
+
+  roles:
+    - setup_terraform_host
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Setup Complete!
+          ========================================
+          Your Amazon Linux 2023 instance is now configured as a Terraform automation host.
+
+          Installed components:
+            - Python 3
+            - Ansible
+            - pywinrm (for Windows host management)
+            - Terraform
+
+          You can now run Terraform with Ansible provisioners that manage Windows hosts.
+          ========================================

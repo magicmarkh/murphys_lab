@@ -336,7 +336,7 @@ locals {
       protocol    = "tcp"
     },
     {
-      description = "WMI"
+      description = "RPC Endpoint Mapper"
       from_port   = 135
       to_port     = 135
       protocol    = "tcp"

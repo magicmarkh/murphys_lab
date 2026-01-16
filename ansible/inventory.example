@@ -1,0 +1,9 @@
+# Example inventory file for setting up AL2023 Terraform host
+# Copy this file to 'inventory' and update with your host details
+
+[terraform_hosts]
+# Replace with your EC2 instance IP or hostname
+# terraform-host ansible_host=192.168.1.100 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/your-key.pem
+
+[terraform_hosts:vars]
+ansible_python_interpreter=/usr/bin/python3
