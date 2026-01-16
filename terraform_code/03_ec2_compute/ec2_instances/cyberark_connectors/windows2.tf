@@ -68,13 +68,20 @@ EOT
   }
 }
 
+# Wait for Windows server to fully stabilize after domain join and reboot
+resource "time_sleep" "wait_after_domain_join" {
+  depends_on = [null_resource.join_domain]
+
+  create_duration = "180s"  # Wait 3 minutes for server to be fully ready
+}
+
 resource "idsec_sia_access_connector" "windows_connector" {
   connector_type    = "AWS"
   connector_os      = "windows"
   connector_pool_id = "2fc8846d-2e29-4aa8-b8a2-d3b4738c8e5e"
   target_machine    = "192.168.20.27"
-  username          = "Administrator"
-  password  = random_password.local_admin_password.result
-  depends_on = [aws_instance.connector_3]
-  winrm_protocol = "http"
+  username          = "${var.domain_join_username}@${var.domain_name}"
+  password          = var.domain_join_password
+  depends_on        = [time_sleep.wait_after_domain_join]
+  winrm_protocol    = "http"
 }

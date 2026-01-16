@@ -10,5 +10,9 @@ terraform {
       source  = "cyberark/idsec"
       version = "~> 0.1.11"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
