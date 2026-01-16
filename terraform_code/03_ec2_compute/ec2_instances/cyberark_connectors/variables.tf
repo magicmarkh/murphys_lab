@@ -62,3 +62,18 @@ variable "private_key_path" {
   description = "Path to the private key file for SSH access"
   type        = string
 }
+
+# ===========================
+# Conjur Secret Variables
+# ===========================
+variable "domain_join_username" {
+  description = "Domain join username from Conjur"
+  type        = string
+  sensitive   = true
+}
+
+variable "domain_join_password" {
+  description = "Domain join password from Conjur"
+  type        = string
+  sensitive   = true
+}

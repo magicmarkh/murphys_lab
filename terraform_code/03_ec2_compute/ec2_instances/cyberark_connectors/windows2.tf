@@ -60,8 +60,8 @@ cd ../ansible && ansible-playbook \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'hostname=${var.hostname}' \
-  -e 'domain_join_username=${data.conjur_secret.domain_join_username.value}@${var.domain_name}' \
-  -e 'domain_join_password=${data.conjur_secret.domain_join_password.value}' \
+  -e 'domain_join_username=${var.domain_join_username}@${var.domain_name}' \
+  -e 'domain_join_password=${var.domain_join_password}' \
   -e 'domain_name=${var.domain_name}' \
   playbooks/onboard_windows_connector.yml
 EOT
@@ -74,6 +74,6 @@ resource "idsec_sia_access_connector" "windows_connector" {
   connector_pool_id = "2fc8846d-2e29-4aa8-b8a2-d3b4738c8e5e"
   target_machine    = "192.168.20.27"
   username          = "Administrator"
-  password  = data.conjur_secret.domain_join_password.value
+  password  = var.domain_join_password
   depends_on = [aws_instance.connector_3]
 }

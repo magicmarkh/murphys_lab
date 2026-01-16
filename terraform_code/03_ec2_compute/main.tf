@@ -131,7 +131,9 @@ module "cyberark_connectors" {
   hostname                 = "us-ent-east-sia-aws-connector-2"
 
   #connector3 testing
-  domain_name = var.domain_name
+  domain_name            = var.domain_name
+  domain_join_username   = data.conjur_secret.domain_join_username.value
+  domain_join_password   = data.conjur_secret.domain_join_password.value
 }
 
 module "targets" {
