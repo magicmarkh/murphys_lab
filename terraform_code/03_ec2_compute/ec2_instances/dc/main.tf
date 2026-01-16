@@ -22,7 +22,7 @@ resource "aws_instance" "us-ent-east-dc1" {
   }
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags,ami]
     prevent_destroy = true
   }
 }

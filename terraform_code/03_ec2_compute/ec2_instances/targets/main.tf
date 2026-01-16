@@ -80,7 +80,7 @@ resource "aws_instance" "target_windows_server" {
   }
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags, ami]
     prevent_destroy = true
   }
 }
