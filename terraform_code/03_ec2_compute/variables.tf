@@ -128,6 +128,30 @@ variable "conjur_identity_client_secret_path" {
   default     = ""
 }
 
+variable "conjur_domain_join_username_path" {
+  description = "Conjur secret path for domain join username"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_domain_join_password_path" {
+  description = "Conjur secret path for domain join password"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_identity_username_path" {
+  description = "Conjur secret path for identity username"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_identity_password_path" {
+  description = "Conjur secret path for identity password"
+  type        = string
+  default     = ""
+}
+
 # ===========================
 # Remote State Variables
 # ===========================
@@ -153,4 +177,10 @@ variable "state_region" {
   description = "AWS region for Terraform state bucket"
   type        = string
   default     = "us-east-1"
+}
+
+variable "domain_name" {
+  description = "domain to join the Windows connector to"
+  type        = string
+  default     = ""
 }
