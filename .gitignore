@@ -64,5 +64,4 @@ terraform_code/terraform.log
 docs/
 
 #stuff I'm working on that I'm not ready to check in yet
-terraform_code/05_cyberark_config/accounts/
 examples/privilege_cloud_bulk_test/
