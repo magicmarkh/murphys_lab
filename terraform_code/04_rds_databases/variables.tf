@@ -53,3 +53,42 @@ variable "state_region" {
   type        = string
   default     = "us-east-1"
 }
+
+# ===========================
+# Conjur Variables
+# ===========================
+variable "conjur_appliance_url" {
+  description = "URL of the Conjur appliance"
+  type        = string
+  default     = "https://murphyslab.secretsmgr.cyberark.cloud/api"
+}
+
+variable "conjur_account" {
+  description = "Conjur account name"
+  type        = string
+  default     = "conjur"
+}
+
+variable "conjur_login" {
+  description = "Conjur login name"
+  type        = string
+  default     = "host/data/murphys-tf"
+}
+
+variable "conjur_api_key" {
+  description = "Conjur API key for the specified login"
+  type        = string
+  sensitive   = true
+}
+
+variable "conjur_aws_access_key_path" {
+  description = "Conjur secret path for AWS Access Key ID"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_aws_secret_key_path" {
+  description = "Conjur secret path for AWS Secret Access Key"
+  type        = string
+  default     = ""
+}

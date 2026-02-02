@@ -152,6 +152,18 @@ variable "conjur_identity_password_path" {
   default     = ""
 }
 
+variable "conjur_aws_access_key_path" {
+  description = "Conjur secret path for AWS Access Key ID"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_aws_secret_key_path" {
+  description = "Conjur secret path for AWS Secret Access Key"
+  type        = string
+  default     = ""
+}
+
 # ===========================
 # Remote State Variables
 # ===========================

@@ -1,5 +1,7 @@
 provider "aws" {
-  region = var.region
+  region     = var.region
+  access_key = data.conjur_secret.aws_access_key.value
+  secret_key = data.conjur_secret.aws_secret_key.value
 }
 
 terraform {
@@ -11,7 +13,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.1.12"
+      version = "~> 0.1.13"
     }
     conjur = {
       source  = "cyberark/conjur"
@@ -34,6 +36,14 @@ data "conjur_secret" "identity_client_id" {
 
 data "conjur_secret" "identity_client_secret" {
   name = var.conjur_identity_client_secret_path
+}
+
+data "conjur_secret" "aws_access_key" {
+  name = var.conjur_aws_access_key_path
+}
+
+data "conjur_secret" "aws_secret_key" {
+  name = var.conjur_aws_secret_key_path
 }
 
 provider "idsec" {

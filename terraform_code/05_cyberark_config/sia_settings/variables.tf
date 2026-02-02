@@ -34,3 +34,15 @@ variable "conjur_identity_client_secret_path" {
   description = "Conjur secret path for identity client secret"
   type        = string
 }
+
+variable "conjur_aws_access_key_path" {
+  description = "Conjur secret path for AWS Access Key ID"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_aws_secret_key_path" {
+  description = "Conjur secret path for AWS Secret Access Key"
+  type        = string
+  default     = ""
+}

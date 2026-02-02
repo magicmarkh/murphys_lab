@@ -41,6 +41,18 @@ variable "conjur_identity_client_secret_path" {
   type        = string
 }
 
+variable "conjur_aws_access_key_path" {
+  description = "Conjur secret path for AWS Access Key ID"
+  type        = string
+  default     = ""
+}
+
+variable "conjur_aws_secret_key_path" {
+  description = "Conjur secret path for AWS Secret Access Key"
+  type        = string
+  default     = ""
+}
+
 # ===========================
 # Connector Manager Variables
 # ===========================
