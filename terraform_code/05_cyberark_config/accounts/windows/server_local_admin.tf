@@ -51,4 +51,19 @@ resource "idsec_pcloud_account" "server_accounts" {
   secret      = var.server_secret
   safe_name   = idsec_pcloud_safe.m-server-local-admin.safe_name
   name        = "win-local-${each.value}"
+
+  lifecycle {
+    ignore_changes = [
+      secret,
+      name,
+      account_id,
+      created_time,
+      category_modification_time,
+      secret_type,
+      secret_management,
+      platform_account_properties,
+      remote_machines_access,
+      status
+    ]
+  }
 }

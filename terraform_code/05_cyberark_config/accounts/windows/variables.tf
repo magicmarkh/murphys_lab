@@ -126,3 +126,48 @@ variable "server_secret" {
   default     = "dummy!@#$1234"
   sensitive   = true
 }
+
+# ===========================
+# Domain Admin Accounts
+# ===========================
+variable "domain_admin_accounts" {
+  type = map(object({
+    username        = string
+    address         = string
+    platform_id     = string
+    secret          = string
+    remote_machines = optional(list(string), [])
+  }))
+  description = "Map of domain admin accounts to manage"
+  default     = {}
+}
+
+# ===========================
+# Domain Server Admin Accounts
+# ===========================
+variable "domain_server_admin_accounts" {
+  type = map(object({
+    username        = string
+    address         = string
+    platform_id     = string
+    secret          = string
+    remote_machines = optional(list(string), [])
+  }))
+  description = "Map of domain server admin accounts to manage"
+  default     = {}
+}
+
+# ===========================
+# Domain User Accounts
+# ===========================
+variable "domain_user_accounts" {
+  type = map(object({
+    username        = string
+    address         = string
+    platform_id     = string
+    secret          = string
+    remote_machines = optional(list(string), [])
+  }))
+  description = "Map of domain user accounts to manage"
+  default     = {}
+}
