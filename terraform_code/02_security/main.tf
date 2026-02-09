@@ -50,3 +50,19 @@ module "jenkins_server_role" {
   asset_owner_name = var.asset_owner_name
 }
 */
+
+# =====================================================================
+# IAM USERS
+# =====================================================================
+module "us_ent_east_automation_user" {
+  source = "./iam_users"
+
+  iam_username  = var.automation_iam_username
+  iam_user_path = var.automation_iam_user_path
+
+  tags = {
+    Owner       = var.asset_owner_name
+    Team        = var.team_name
+    Environment = "lab"
+  }
+}

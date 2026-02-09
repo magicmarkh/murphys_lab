@@ -135,3 +135,49 @@ variable "state_region" {
   type        = string
   default     = "us-east-1"
 }
+
+# ===========================
+# AWS Access Keys Variables
+# ===========================
+variable "aws_access_key_safe_members" {
+  type = map(object({
+    member_name                = string
+    member_type                = string
+    search_in                  = optional(string)
+    membership_expiration_date = optional(number)
+    permission_set             = string
+  }))
+  description = "Map of members to add to the AWS access keys safe with their permissions"
+  default     = {}
+}
+
+variable "aws_access_key_platform_id" {
+  type        = string
+  description = "Platform ID for AWS access key accounts"
+  default     = "M-AWS-Access-Keys"
+}
+
+variable "aws_access_key_username" {
+  type        = string
+  description = "IAM username for the AWS access key account"
+  default     = "us-ent-east-automation"
+}
+
+variable "aws_access_key_address" {
+  type        = string
+  description = "AWS Account ID"
+  default     = "475601244925"
+}
+
+variable "aws_access_key_secret" {
+  type        = string
+  description = "AWS Secret Access Key"
+  default     = "dummy!@#$1234"
+  sensitive   = true
+}
+
+variable "aws_access_key_account_name" {
+  type        = string
+  description = "Account name in CyberArk Privilege Cloud"
+  default     = "us-ent-east-automation"
+}

@@ -40,6 +40,24 @@ output "secrets_hub_onboarding_role_arn" {
   sensitive   = true
 }
 
+# =====================================================================
+# IAM User Outputs
+# =====================================================================
+output "automation_user_name" {
+  description = "Name of the automation IAM user"
+  value       = module.us_ent_east_automation_user.iam_user_name
+}
+
+output "automation_user_arn" {
+  description = "ARN of the automation IAM user"
+  value       = module.us_ent_east_automation_user.iam_user_arn
+}
+
+output "automation_access_key_ids" {
+  description = "List of access key IDs for the automation user"
+  value       = module.us_ent_east_automation_user.access_key_ids
+}
+
 output "ec2_tf_automation_instance_profile_name" {
   description = "Name of the EC2 Terraform automation instance profile"
   value       = module.ec2_tf_automation_role.instance_profile_name

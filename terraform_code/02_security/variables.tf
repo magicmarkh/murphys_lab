@@ -109,3 +109,18 @@ variable "conjur_aws_secret_key_path" {
   type        = string
   default     = ""
 }
+
+# ===========================
+# IAM User Variables
+# ===========================
+variable "automation_iam_username" {
+  description = "IAM username for the automation user"
+  type        = string
+  default     = "us-ent-east-automation"
+}
+
+variable "automation_iam_user_path" {
+  description = "Path for the automation IAM user"
+  type        = string
+  default     = "/"
+}
