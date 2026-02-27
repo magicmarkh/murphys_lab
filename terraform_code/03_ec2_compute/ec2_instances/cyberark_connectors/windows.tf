@@ -58,7 +58,7 @@ cd ../../ansible && ansible-playbook \
   -e 'ansible_port=5985' \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
-  -e 'hostname=${var.hostname}' \
+  -e 'hostname=${var.windows_connector_hostname}' \
   -e 'domain_join_username=${var.domain_join_username}@${var.domain_name}' \
   -e 'domain_join_password=${var.domain_join_password}' \
   -e 'domain_name=${var.domain_name}' \
@@ -83,4 +83,13 @@ resource "idsec_sia_access_connector" "windows_connector" {
   password          = var.domain_join_password
   depends_on        = [time_sleep.wait_after_domain_join]
   winrm_protocol    = "http"
+
+  lifecycle {
+    ignore_changes = [
+      connector_id,
+      password,
+      private_key_contents,
+      private_key_path
+    ]
+  }
 }

@@ -53,14 +53,39 @@ variable "connector_1_private_ip" {
   type        = string
 }
 
+variable "windows_connector_hostname" {
+  description = "Hostname for the Windows connector instance"
+  type        = string
+  default     = "us-ent-east-connector-1"
+}
+
 variable "sia_aws_connector_1_private_ip" {
   description = "private ip of sia aws connector 1"
   type        = string
 }
 
 variable "sia_aws_connector_2_private_ip" {
-  description = "private ip of sia aws connector 2"
+  description = "private ip of sia aws connector 2 (deprecated - use linux_connector_count instead)"
   type        = string
+  default     = ""
+}
+
+variable "linux_connector_count" {
+  description = "Number of Linux SIA connectors to deploy"
+  type        = number
+  default     = 1
+}
+
+variable "linux_connector_hostname_prefix" {
+  description = "Hostname prefix for Linux connectors (will append -1, -2, -3, etc.)"
+  type        = string
+  default     = "us-ent-east-sia-aws-connector"
+}
+
+variable "linux_connector_name_prefix" {
+  description = "Name tag prefix for Linux connectors"
+  type        = string
+  default     = "linux-sia-connector"
 }
 
 variable "connector_pool_name" {

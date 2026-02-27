@@ -17,6 +17,11 @@ variable "windows_security_group_ids" {
 variable "connector_1_private_ip" {}
 variable "sia_aws_connector_1_private_ip" {}
 
+variable "windows_connector_hostname" {
+  description = "Hostname for the Windows connector instance"
+  type        = string
+  default     = "us-ent-east-connector-1"
+}
 
 variable "windows_instance_type" {
   description = "instance type to be deployed"
@@ -46,21 +51,28 @@ variable "linux_security_group_ids" {
   type        = string
 }
 
-variable "sia_linux_private_ip" {
-  description = "Private IP address for SIA Linux connector"
+variable "linux_connector_count" {
+  description = "Number of Linux SIA connectors to deploy"
+  type        = number
+  default     = 1
+}
+
+variable "linux_connector_hostname_prefix" {
+  description = "Hostname prefix for Linux connectors (will append -1, -2, -3, etc.)"
   type        = string
+  default     = "us-ent-east-sia-aws-connector"
+}
+
+variable "linux_connector_name_prefix" {
+  description = "Name tag prefix for Linux connectors"
+  type        = string
+  default     = "linux-sia-connector"
 }
 
 #variable "instance_profile_name" {
 #  description = "IAM instance profile name for ASM access"
 #  type        = string#
 #}
-
-variable "hostname" {
-  description = "Hostname for the Linux connector instance"
-  type        = string
-  default     = "us-ent-east-sia-aws-connector-2"
-}
 
 variable "private_key_path" {
   description = "Path to the private key file for SSH access"
