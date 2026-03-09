@@ -233,7 +233,7 @@ resource "time_sleep" "wait_after_domain_join" {
 # CyberArk Safe: For storing the Administrator password
 # =====================================================================
 resource "idsec_pcloud_safe" "demo_target_safe" {
-  safe_name                = "m-demo-windows-target"
+  safe_name                = var.safe_name
   description              = var.safe_description
   number_of_days_retention = var.safe_retention_days
 

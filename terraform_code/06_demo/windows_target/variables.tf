@@ -84,6 +84,11 @@ variable "platform_id" {
   default     = "M-Windows-Server-Local-Admin"
 }
 
+variable "safe_name" {
+  description = "Name of the safe created in CyberArk"
+  type = string
+  default = "m-eph-windows-local"
+}
 variable "safe_description" {
   description = "Description for the CyberArk safe"
   type        = string
