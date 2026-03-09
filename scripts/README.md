@@ -145,6 +145,7 @@ The scripts manage these terraform_code modules:
 - `05_cyberark_config/accounts/linux`
 - `05_cyberark_config/accounts/windows`
 - `05_cyberark_config/accounts/cloud`
+- `06_demo/windows_target`
 
 ### Examples
 
@@ -177,14 +178,18 @@ s3://us-ent-east/tfvars-config/
 │   ├── 04_rds_databases/
 │   │   ├── terraform.tfvars
 │   │   └── backend.tf
-│   └── 05_cyberark_config/
-│       ├── connector_pools/
-│       ├── users/
-│       └── accounts/
-│           ├── database/
-│           ├── linux/
-│           ├── windows/
-│           └── cloud/
+│   ├── 05_cyberark_config/
+│   │   ├── connector_pools/
+│   │   ├── users/
+│   │   └── accounts/
+│   │       ├── database/
+│   │       ├── linux/
+│   │       ├── windows/
+│   │       └── cloud/
+│   └── 06_demo/
+│       └── windows_target/
+│           ├── terraform.tfvars
+│           └── backend.tf
 └── examples/
     ├── privilege_cloud/
     ├── identity/

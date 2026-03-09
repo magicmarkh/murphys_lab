@@ -1,0 +1,30 @@
+---
+- name: Remove Windows Computer from Domain
+  hosts: all
+  gather_facts: no
+  connection: winrm
+  vars:
+    ansible_port: 5985
+    ansible_connection: winrm
+    ansible_winrm_transport: basic
+    ansible_winrm_server_cert_validation: ignore
+
+  tasks:
+    - name: Wait for WinRM to be ready
+      wait_for_connection:
+        timeout: 60
+        delay: 5
+      ignore_errors: yes
+
+    - name: Remove computer from domain
+      win_domain_membership:
+        workgroup_name: WORKGROUP
+        state: workgroup
+      register: domain_unjoin
+      ignore_errors: yes  # Continue even if unjoin fails
+
+    - name: Reboot if required
+      win_reboot:
+        reboot_timeout: 300
+      when: domain_unjoin.reboot_required and not domain_unjoin.failed
+      ignore_errors: yes
