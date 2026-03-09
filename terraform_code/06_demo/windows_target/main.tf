@@ -229,7 +229,6 @@ resource "idsec_pcloud_safe" "demo_target_safe" {
   description              = var.safe_description
   number_of_days_retention = var.safe_retention_days
 
-  depends_on = [time_sleep.wait_after_domain_join]
 }
 
 # =====================================================================
