@@ -220,14 +220,6 @@ EOT
   }
 }
 
-# =====================================================================
-# Stabilization Wait: Allow server to fully boot after domain join
-# =====================================================================
-resource "time_sleep" "wait_after_domain_join" {
-  depends_on = [null_resource.domain_operations]
-
-  create_duration = "90s"  # Wait 90 seconds for server to be fully ready
-}
 
 # =====================================================================
 # CyberArk Safe: For storing the Administrator password
