@@ -12,19 +12,26 @@
   tasks:
     - name: Wait for WinRM to be ready
       wait_for_connection:
-        timeout: 60
+        timeout: 120
         delay: 5
-      ignore_errors: yes
+      register: winrm_check
+
+    - name: Check if WinRM connection succeeded
+      fail:
+        msg: "Failed to connect to target via WinRM. Instance may already be destroyed."
+      when: winrm_check.failed is defined and winrm_check.failed
 
     - name: Remove computer from domain
       win_domain_membership:
         workgroup_name: WORKGROUP
         state: workgroup
       register: domain_unjoin
-      ignore_errors: yes  # Continue even if unjoin fails
+
+    - name: Display unjoin result
+      debug:
+        msg: "Domain unjoin {{ 'successful' if not domain_unjoin.failed else 'FAILED' }}"
 
     - name: Reboot if required
       win_reboot:
         reboot_timeout: 300
       when: domain_unjoin.reboot_required and not domain_unjoin.failed
-      ignore_errors: yes

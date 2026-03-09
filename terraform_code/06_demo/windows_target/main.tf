@@ -170,16 +170,21 @@ resource "aws_instance" "demo_target" {
 # =====================================================================
 # Domain Join: Ansible Provisioner
 # =====================================================================
-resource "null_resource" "domain_operations" {
-  depends_on = [aws_instance.demo_target]
-
+resource "terraform_data" "domain_operations" {
   # Store values needed for destroy-time provisioner
-  triggers = {
+  # These must be stored in triggers_replace to be available during destroy
+  triggers_replace = {
     instance_id     = aws_instance.demo_target.id
     instance_ip     = aws_instance.demo_target.private_ip
+    admin_password  = random_password.admin_password.result
     domain_user     = "${data.conjur_secret.domain_join_username.value}@${var.domain_name}"
     domain_password = data.conjur_secret.domain_join_password.value
+    domain_name     = var.domain_name
+    hostname        = var.hostname
   }
+
+  # Output ensures this resource is in the dependency graph
+  input = aws_instance.demo_target.id
 
   # Create-time provisioner: Join domain
   provisioner "local-exec" {
@@ -201,23 +206,42 @@ EOT
   }
 
   # Destroy-time provisioner: Unjoin from domain
+  # This will run BEFORE the instance is destroyed if proper order is followed
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
+echo "==================== DOMAIN UNJOIN STARTING ===================="
+echo "Target IP: ${self.triggers_replace.instance_ip}"
+echo "Domain User: ${self.triggers_replace.domain_user}"
+echo "==============================================================="
+
 cd ../../../ansible && ansible-playbook \
-  -i '${self.triggers.instance_ip},' \
-  -e 'ansible_user=${self.triggers.domain_user}' \
-  -e 'ansible_password=${self.triggers.domain_password}' \
+  -i '${self.triggers_replace.instance_ip},' \
+  -e 'ansible_user=${self.triggers_replace.domain_user}' \
+  -e 'ansible_password=${self.triggers_replace.domain_password}' \
   -e 'ansible_connection=winrm' \
   -e 'ansible_port=5985' \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   playbooks/unjoin_domain.yml
+
+UNJOIN_RESULT=$?
+if [ $UNJOIN_RESULT -eq 0 ]; then
+  echo "==================== DOMAIN UNJOIN SUCCESSFUL ===================="
+else
+  echo "==================== DOMAIN UNJOIN FAILED (exit code: $UNJOIN_RESULT) ===================="
+  echo "WARNING: Instance will remain joined to domain!"
+  exit $UNJOIN_RESULT
+fi
 EOT
 
-    # Continue even if unjoin fails
-    on_failure = continue
+    # Make failures visible - do NOT continue on failure
+    # This ensures you know if unjoin fails
+    on_failure = fail
   }
+
+  # Explicit dependency: domain operations depend on instance existing
+  depends_on = [aws_instance.demo_target]
 }
 
 
