@@ -15,6 +15,18 @@ resource "idsec_pcloud_safe_member" "members" {
   search_in                  = try(each.value.search_in, null)
   membership_expiration_date = try(each.value.membership_expiration_date, null)
   permission_set             = each.value.permission_set
+
+  lifecycle {
+    ignore_changes = [
+      is_expired_membership_enabled,
+      is_predefined_user,
+      is_read_only,
+      member_id,
+      membership_expiration_date,
+      permissions,
+      safe_number
+    ]
+  }
 }
 /*
   permissions = {
@@ -60,9 +72,7 @@ resource "idsec_pcloud_account" "server_accounts" {
       created_time,
       category_modification_time,
       secret_type,
-      secret_management,
       platform_account_properties,
-      remote_machines_access,
       status
     ]
   }

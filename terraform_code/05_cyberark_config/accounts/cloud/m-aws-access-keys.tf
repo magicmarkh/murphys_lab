@@ -49,8 +49,6 @@ resource "idsec_pcloud_account" "us-ent-east-automation" {
       created_time,                # Computed by CyberArk
       category_modification_time,  # Computed by CyberArk
       platform_account_properties, # Managed by CyberArk platform
-      remote_machines_access,      # Computed field
-      secret_management,           # Managed by CPM
       secret_type,                 # Computed field
       status                       # Computed field
     ]

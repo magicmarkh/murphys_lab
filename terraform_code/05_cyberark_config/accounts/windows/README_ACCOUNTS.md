@@ -119,10 +119,9 @@ resource "idsec_pcloud_account" "new_account_type_accounts" {
   safe_name   = idsec_pcloud_safe.new-account-type-safe.safe_name
   name        = "account-type-${each.value.username}"
 
-  remote_machines_access = {
-    remote_machines                      = each.value.remote_machines
-    access_restricted_to_remote_machines = length(each.value.remote_machines) > 0
-  }
+  # Remote machine access restrictions (v0.1.17+ syntax)
+  remote_machines                      = try(each.value.remote_machines, [])
+  access_restricted_to_remote_machines = try(length(each.value.remote_machines) > 0, false)
 
   lifecycle {
     ignore_changes = [
@@ -132,9 +131,9 @@ resource "idsec_pcloud_account" "new_account_type_accounts" {
       created_time,
       category_modification_time,
       secret_type,
-      secret_management,
       platform_account_properties,
-      remote_machines_access,
+      remote_machines,                      # v0.1.17+: top-level attribute
+      access_restricted_to_remote_machines, # v0.1.17+: top-level attribute
       status
     ]
   }
@@ -180,12 +179,49 @@ The following attributes are managed by CyberArk and ignored by Terraform after 
 | `secret` | CyberArk CPM | Automatically rotated |
 | `account_id` | CyberArk | Assigned at creation |
 | `created_time` | CyberArk | Timestamp management |
-| `secret_management` | CyberArk CPM | Rotation settings |
-| `remote_machines_access` | CyberArk | Access controls |
+| `remote_machines` | CyberArk | v0.1.17+: List of allowed remote machines |
+| `access_restricted_to_remote_machines` | CyberArk | v0.1.17+: Boolean restriction flag |
 | `platform_account_properties` | CyberArk Platform | Platform-specific settings |
 | `status` | CyberArk | Account status |
 
 **Important:** Terraform creates accounts with the specified `secret`, but CyberArk CPM manages password rotation thereafter. Do not update passwords through Terraform after initial creation.
+
+## IDSec Provider v0.1.17 Migration
+
+**Breaking Changes:**
+
+The v0.1.17 provider changed the remote machine access syntax from a nested block to top-level attributes:
+
+**Before (v0.1.12):**
+```hcl
+remote_machines_access = {
+  remote_machines                      = ["ip1", "ip2"]
+  access_restricted_to_remote_machines = true
+}
+
+lifecycle {
+  ignore_changes = [secret, secret_management, remote_machines_access, status]
+}
+```
+
+**After (v0.1.17):**
+```hcl
+remote_machines                      = ["ip1", "ip2"]
+access_restricted_to_remote_machines = true
+
+lifecycle {
+  ignore_changes = [secret, remote_machines, access_restricted_to_remote_machines, status]
+}
+```
+
+**Removed Attributes:**
+- `secret_management` - CPM settings are now managed at the platform level only
+- `remote_machines_access` (as a block) - Replaced with individual top-level attributes
+
+**Migration Impact:**
+- Remote machine restrictions functionality is preserved
+- Existing accounts are not modified (syntax-only change)
+- Terraform plan should show no changes after migration
 
 ## Account Naming Convention
 

@@ -261,9 +261,7 @@ resource "idsec_pcloud_account" "demo_target_admin" {
       created_time,                   # Timestamp management
       category_modification_time,     # Category updates
       secret_type,                    # Computed by CyberArk
-      secret_management,              # CPM rotation settings
       platform_account_properties,    # Platform-specific settings
-      remote_machines_access,         # Managed by CyberArk
       status                          # Account status
     ]
   }

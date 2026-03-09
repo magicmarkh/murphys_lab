@@ -49,4 +49,17 @@ resource "idsec_pcloud_account" "us-ent-east-key-pem" {
   secret      = data.terraform_remote_state.ec2_compute.outputs.private_key_pem
   safe_name   = idsec_pcloud_safe.m-aws-pem-unmanaged.safe_name
   name        = "aws-us-ent-east-key-pem"
+
+  lifecycle {
+    ignore_changes = [
+      secret,
+      name,
+      account_id,
+      created_time,
+      category_modification_time,
+      secret_type,
+      platform_account_properties,
+      status
+    ]
+  }
 }

@@ -24,10 +24,9 @@ resource "idsec_pcloud_account" "domain_admin_accounts" {
   safe_name   = idsec_pcloud_safe.m-domain-admins.safe_name
   name        = "domain-admin-${each.value.username}"
 
-  remote_machines_access = {
-    remote_machines                      = each.value.remote_machines
-    access_restricted_to_remote_machines = length(each.value.remote_machines) > 0
-  }
+  # Remote machine access restrictions (v0.1.17+ syntax)
+  remote_machines                      = try(each.value.remote_machines, [])
+  access_restricted_to_remote_machines = try(length(each.value.remote_machines) > 0, false)
 
   lifecycle {
     ignore_changes = [
@@ -37,9 +36,9 @@ resource "idsec_pcloud_account" "domain_admin_accounts" {
       created_time,
       category_modification_time,
       secret_type,
-      secret_management,
       platform_account_properties,
-      remote_machines_access,
+      remote_machines,
+      access_restricted_to_remote_machines,
       status
     ]
   }
@@ -67,10 +66,9 @@ resource "idsec_pcloud_account" "domain_server_admin_accounts" {
   safe_name   = idsec_pcloud_safe.m-domain-server-admins.safe_name
   name        = "domain-server-admin-${each.value.username}"
 
-  remote_machines_access = {
-    remote_machines                      = each.value.remote_machines
-    access_restricted_to_remote_machines = length(each.value.remote_machines) > 0
-  }
+  # Remote machine access restrictions (v0.1.17+ syntax)
+  remote_machines                      = try(each.value.remote_machines, [])
+  access_restricted_to_remote_machines = try(length(each.value.remote_machines) > 0, false)
 
   lifecycle {
     ignore_changes = [
@@ -80,9 +78,9 @@ resource "idsec_pcloud_account" "domain_server_admin_accounts" {
       created_time,
       category_modification_time,
       secret_type,
-      secret_management,
       platform_account_properties,
-      remote_machines_access,
+      remote_machines,
+      access_restricted_to_remote_machines,
       status
     ]
   }
@@ -110,10 +108,9 @@ resource "idsec_pcloud_account" "domain_user_accounts" {
   safe_name   = idsec_pcloud_safe.m-domain-user.safe_name
   name        = "domain-user-${each.value.username}"
 
-  remote_machines_access = {
-    remote_machines                      = each.value.remote_machines
-    access_restricted_to_remote_machines = length(each.value.remote_machines) > 0
-  }
+  # Remote machine access restrictions (v0.1.17+ syntax)
+  remote_machines                      = try(each.value.remote_machines, [])
+  access_restricted_to_remote_machines = try(length(each.value.remote_machines) > 0, false)
 
   lifecycle {
     ignore_changes = [
@@ -123,9 +120,9 @@ resource "idsec_pcloud_account" "domain_user_accounts" {
       created_time,
       category_modification_time,
       secret_type,
-      secret_management,
       platform_account_properties,
-      remote_machines_access,
+      remote_machines,
+      access_restricted_to_remote_machines,
       status
     ]
   }
