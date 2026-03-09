@@ -93,7 +93,7 @@ variable "safe_description" {
 variable "safe_retention_days" {
   description = "Number of days to retain deleted accounts in the safe"
   type        = number
-  default     = 7
+  default     = 0
 }
 
 # ===========================
@@ -126,35 +126,35 @@ variable "conjur_api_key" {
 variable "conjur_identity_client_id_path" {
   description = "Conjur secret path for Identity client ID"
   type        = string
-  default     = "data/vault/m-priv-svc-accts/svc_tfautomation/username"
+  default     = "data/your/conjur/path"
 }
 
 variable "conjur_identity_client_secret_path" {
   description = "Conjur secret path for Identity client secret"
   type        = string
-  default     = "data/vault/m-priv-svc-accts/svc_tfautomation/password"
+  default     = "data/your/conjur/path"
 }
 
 variable "conjur_domain_join_username_path" {
   description = "Conjur secret path for domain join username"
   type        = string
-  default     = "data/vault/m-priv-svc-accts/murphys-lab-domain-joiner/username"
+  default     = "data/your/conjur/path"
 }
 
 variable "conjur_domain_join_password_path" {
   description = "Conjur secret path for domain join password"
   type        = string
-  default     = "data/vault/m-priv-svc-accts/murphys-lab-domain-joiner/password"
+  default     = "data/your/conjur/path"
 }
 
 variable "conjur_aws_access_key_path" {
   description = "Conjur secret path for AWS Access Key ID"
   type        = string
-  default     = "data/vault/m-conjur-automation/us-ent-east-automation/AWSAccessKeyID"
+  default     = "data/your/conjur/path"
 }
 
 variable "conjur_aws_secret_key_path" {
   description = "Conjur secret path for AWS Secret Access Key"
   type        = string
-  default     = "data/vault/m-conjur-automation/us-ent-east-automation/password"
+  default     = "data/your/conjur/path"
 }
