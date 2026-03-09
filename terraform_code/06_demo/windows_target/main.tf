@@ -214,13 +214,14 @@ EOT
     command = <<EOT
 echo "==================== DOMAIN UNJOIN STARTING ===================="
 echo "Target IP: ${self.triggers_replace.instance_ip}"
-echo "Domain User: ${self.triggers_replace.domain_user}"
+echo "Hostname: ${self.triggers_replace.hostname}"
+echo "Connecting as: local Administrator account"
 echo "==============================================================="
 
 cd ../../../ansible && ansible-playbook \
   -i '${self.triggers_replace.instance_ip},' \
-  -e 'ansible_user=${self.triggers_replace.domain_user}' \
-  -e 'ansible_password=${self.triggers_replace.domain_password}' \
+  -e 'ansible_user=Administrator' \
+  -e 'ansible_password=${self.triggers_replace.admin_password}' \
   -e 'ansible_connection=winrm' \
   -e 'ansible_port=5985' \
   -e 'ansible_winrm_scheme=http' \
