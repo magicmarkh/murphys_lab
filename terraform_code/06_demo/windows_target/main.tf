@@ -226,7 +226,7 @@ EOT
 resource "time_sleep" "wait_after_domain_join" {
   depends_on = [null_resource.domain_operations]
 
-  create_duration = "180s"  # Wait 3 minutes for server to be fully ready
+  create_duration = "90s"  # Wait 90 seconds for server to be fully ready
 }
 
 # =====================================================================
