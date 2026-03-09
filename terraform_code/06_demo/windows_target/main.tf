@@ -68,37 +68,26 @@ provider "idsec" {
 }
 
 # =====================================================================
-# Data Sources: AWS Infrastructure
+# Data Sources: Remote State (Foundation and Security Layers)
 # =====================================================================
-data "aws_vpc" "main" {
-  filter {
-    name   = "tag:Name"
-    values = [var.vpc_name]
+data "terraform_remote_state" "foundation" {
+  backend = "s3"
+
+  config = {
+    bucket = var.state_bucket
+    key    = var.foundation_state_key
+    region = var.state_region
   }
 }
 
-data "aws_subnet" "private" {
-  filter {
-    name   = "tag:Name"
-    values = [var.subnet_name]
+data "terraform_remote_state" "security" {
+  backend = "s3"
+
+  config = {
+    bucket = var.state_bucket
+    key    = var.security_state_key
+    region = var.state_region
   }
-
-  vpc_id = data.aws_vpc.main.id
-}
-
-data "aws_security_group" "rdp" {
-  name   = var.rdp_sg_name
-  vpc_id = data.aws_vpc.main.id
-}
-
-data "aws_security_group" "winrm" {
-  name   = var.winrm_sg_name
-  vpc_id = data.aws_vpc.main.id
-}
-
-data "aws_security_group" "sia_windows_target" {
-  name   = var.sia_windows_target_sg_name
-  vpc_id = data.aws_vpc.main.id
 }
 
 # Get latest Windows Server 2022 AMI
@@ -132,12 +121,12 @@ resource "random_password" "admin_password" {
 resource "aws_instance" "demo_target" {
   ami                         = data.aws_ami.windows_2022.id
   instance_type               = var.instance_type
-  subnet_id                   = data.aws_subnet.private.id
+  subnet_id                   = data.terraform_remote_state.foundation.outputs.private_subnet_id
   associate_public_ip_address = false
   vpc_security_group_ids = [
-    data.aws_security_group.rdp.id,
-    data.aws_security_group.winrm.id,
-    data.aws_security_group.sia_windows_target.id
+    data.terraform_remote_state.foundation.outputs.rdp_internal_flat_sg_id,
+    data.terraform_remote_state.foundation.outputs.winrm_internal_flat_sg_id,
+    data.terraform_remote_state.foundation.outputs.sia_windows_target_sg_id
   ]
 
   # User data: Set password and enable WinRM
@@ -258,7 +247,7 @@ resource "idsec_pcloud_account" "demo_target_admin" {
   platform_id = var.platform_id
   username    = "Administrator"
   address     = "${var.hostname}.${var.domain_name}"
-  secret      = "dummy!@#$1234"  # Temporary - CPM will reconcile immediately
+  secret      = random_password.admin_password.result  # Actual password set on the server
   safe_name   = idsec_pcloud_safe.demo_target_safe.safe_name
   name        = "demo-win-${var.hostname}-admin"
 
@@ -266,7 +255,7 @@ resource "idsec_pcloud_account" "demo_target_admin" {
 
   lifecycle {
     ignore_changes = [
-      secret,                         # CPM rotates passwords
+      secret,                         # CPM rotates passwords after initial creation
       name,                           # CyberArk manages naming
       account_id,                     # Assigned by CyberArk
       created_time,                   # Timestamp management

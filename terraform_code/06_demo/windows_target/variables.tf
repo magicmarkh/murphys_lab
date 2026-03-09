@@ -40,36 +40,30 @@ variable "instance_type" {
 }
 
 # ===========================
-# Network Configuration
+# Remote State Configuration
 # ===========================
-variable "vpc_name" {
-  description = "Name tag of the VPC to deploy into"
+variable "state_bucket" {
+  description = "S3 bucket name for Terraform remote state"
   type        = string
-  default     = "us-ent-east-vpc"
+  default     = "us-ent-east"
 }
 
-variable "subnet_name" {
-  description = "Name tag of the subnet to deploy into"
+variable "state_region" {
+  description = "AWS region for S3 state bucket"
   type        = string
-  default     = "private-flat"
+  default     = "us-east-2"
 }
 
-variable "rdp_sg_name" {
-  description = "Name of the RDP security group"
+variable "foundation_state_key" {
+  description = "S3 key for foundation layer state"
   type        = string
-  default     = "rdp_internal_flat_sg"
+  default     = "terraform/foundation.tfstate"
 }
 
-variable "winrm_sg_name" {
-  description = "Name of the WinRM security group"
+variable "security_state_key" {
+  description = "S3 key for security layer state"
   type        = string
-  default     = "winrm_internal_flat_sg"
-}
-
-variable "sia_windows_target_sg_name" {
-  description = "Name of the SIA Windows target security group"
-  type        = string
-  default     = "sia_windows_target_sg"
+  default     = "terraform/security.tfstate"
 }
 
 # ===========================
