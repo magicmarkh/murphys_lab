@@ -226,6 +226,8 @@ cd ../../../ansible && ansible-playbook \
   -e 'ansible_port=5985' \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
+  -e 'domain_admin_user=${self.triggers_replace.domain_user}' \
+  -e 'domain_admin_password=${self.triggers_replace.domain_password}' \
   playbooks/unjoin_domain.yml
 
 UNJOIN_RESULT=$?

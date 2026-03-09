@@ -24,6 +24,8 @@
     - name: Remove computer from domain
       win_domain_membership:
         workgroup_name: WORKGROUP
+        domain_admin_user: "{{ domain_admin_user }}"
+        domain_admin_password: "{{ domain_admin_password }}"
         state: workgroup
       register: domain_unjoin
 
