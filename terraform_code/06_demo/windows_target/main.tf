@@ -249,7 +249,7 @@ resource "idsec_pcloud_account" "demo_target_admin" {
   address     = "${var.hostname}.${var.domain_name}"
   secret      = random_password.admin_password.result  # Actual password set on the server
   safe_name   = idsec_pcloud_safe.demo_target_safe.safe_name
-  name        = "demo-win-${var.hostname}-admin"
+  name        = "${var.hostname}-admin"
 
   depends_on = [idsec_pcloud_safe.demo_target_safe]
 

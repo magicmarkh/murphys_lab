@@ -30,7 +30,7 @@ variable "iScheduler" {
 variable "hostname" {
   description = "Hostname for the Windows target instance"
   type        = string
-  default     = "demo-win-target"
+  default     = "win-target-2"
 }
 
 variable "instance_type" {
