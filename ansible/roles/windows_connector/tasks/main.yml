@@ -9,6 +9,7 @@
     hostname: "{{ hostname }}"
     domain_admin_user: "{{ domain_join_username }}"
     domain_admin_password: "{{ domain_join_password }}"
+    domain_ou_path: "{{ domain_ou_path | default(omit) }}"
     state: domain
   register: domain_join
 

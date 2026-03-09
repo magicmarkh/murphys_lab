@@ -180,6 +180,7 @@ resource "terraform_data" "domain_operations" {
     domain_user     = "${data.conjur_secret.domain_join_username.value}@${var.domain_name}"
     domain_password = data.conjur_secret.domain_join_password.value
     domain_name     = var.domain_name
+    domain_ou_path  = var.domain_ou_path
     hostname        = var.hostname
   }
 
@@ -201,6 +202,7 @@ cd ../../../ansible && ansible-playbook \
   -e 'domain_join_username=${data.conjur_secret.domain_join_username.value}@${var.domain_name}' \
   -e 'domain_join_password=${data.conjur_secret.domain_join_password.value}' \
   -e 'domain_name=${var.domain_name}' \
+  -e 'domain_ou_path=${var.domain_ou_path}' \
   playbooks/onboard_windows_connector.yml
 EOT
   }

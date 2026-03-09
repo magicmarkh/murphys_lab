@@ -75,6 +75,12 @@ variable "domain_name" {
   default     = "murphyslab.local"
 }
 
+variable "domain_ou_path" {
+  description = "Active Directory Organizational Unit path for the computer object (e.g., OU=Servers,DC=murphyslab,DC=local)"
+  type        = string
+  default     = "CN=Computers"  # Default computers container
+}
+
 # ===========================
 # CyberArk Configuration
 # ===========================
