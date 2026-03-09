@@ -21,6 +21,10 @@
         msg: "Failed to connect to target via WinRM. Instance may already be destroyed."
       when: winrm_check.failed is defined and winrm_check.failed
 
+    - name: Get current computer name before unjoin
+      win_shell: $env:COMPUTERNAME
+      register: computer_name
+
     - name: Remove computer from domain
       win_domain_membership:
         workgroup_name: WORKGROUP
@@ -32,6 +36,25 @@
     - name: Display unjoin result
       debug:
         msg: "Domain unjoin {{ 'successful' if not domain_unjoin.failed else 'FAILED' }}"
+
+    - name: Delete computer object from Active Directory
+      win_shell: |
+        $username = "{{ domain_admin_user }}"
+        $password = ConvertTo-SecureString "{{ domain_admin_password }}" -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential($username, $password)
+
+        try {
+            $computerName = "{{ computer_name.stdout | trim }}"
+            $adComputer = Get-ADComputer -Identity $computerName -Credential $credential -ErrorAction Stop
+            Remove-ADComputer -Identity $computerName -Credential $credential -Confirm:$false -ErrorAction Stop
+            Write-Output "Successfully deleted computer object '$computerName' from Active Directory"
+        }
+        catch {
+            Write-Output "Warning: Could not delete computer object from AD: $_"
+            # Don't fail - the object might already be gone or we don't have permissions
+        }
+      when: not domain_unjoin.failed
+      ignore_errors: yes
 
     - name: Reboot if required
       win_reboot:
