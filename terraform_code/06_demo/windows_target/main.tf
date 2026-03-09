@@ -229,6 +229,7 @@ resource "idsec_pcloud_safe" "demo_target_safe" {
   description              = var.safe_description
   number_of_days_retention = var.safe_retention_days
 
+  depends_on = [aws_instance.demo_target]  # Ensure instance creation is successful before creating a safe to vault account
 }
 
 # =====================================================================
@@ -242,7 +243,7 @@ resource "idsec_pcloud_account" "demo_target_admin" {
   safe_name   = idsec_pcloud_safe.demo_target_safe.safe_name
   name        = "${var.hostname}-admin"
 
-  depends_on = [idsec_pcloud_safe.demo_target_safe]
+  depends_on = [idsec_pcloud_safe.demo_target_safe] # Ensure safe is created before vaulting account
 
   lifecycle {
     ignore_changes = [
