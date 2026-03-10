@@ -26,50 +26,9 @@
       register: computer_name
 
     - name: Delete computer object from Active Directory using ADSI (BEFORE unjoining)
-      win_shell: |
-        $domainUser = '{{ domain_admin_user }}'
-        $domainPassword = '{{ domain_admin_password }}'
-        $computerName = '{{ computer_name.stdout | trim }}'
-        $domainName = '{{ domain_name }}'
-
-        try {
-            # Parse domain name to get DC components (e.g., murphyslab.local -> DC=murphyslab,DC=local)
-            $dcPath = "DC=" + ($domainName -replace "\.", ",DC=")
-
-            # Create DirectoryEntry with credentials
-            $ldapPath = "LDAP://$domainName/$dcPath"
-            $directoryEntry = New-Object System.DirectoryServices.DirectoryEntry($ldapPath, $domainUser, $domainPassword)
-
-            # Search for the computer object
-            $searcher = New-Object System.DirectoryServices.DirectorySearcher
-            $searcher.SearchRoot = $directoryEntry
-            $searcher.Filter = "(&(objectClass=computer)(cn=$computerName))"
-            $searcher.SearchScope = "Subtree"
-
-            $result = $searcher.FindOne()
-
-            if ($result -ne $null) {
-                # Get the computer object's parent container
-                $computerObject = $result.GetDirectoryEntry()
-                $computerDN = $computerObject.distinguishedName
-
-                # Delete the computer object
-                $computerObject.DeleteTree()
-                $computerObject.CommitChanges()
-
-                Write-Output "Successfully deleted computer object '$computerName' (DN: $computerDN) from Active Directory"
-                exit 0
-            }
-            else {
-                Write-Output "Computer object '$computerName' not found in Active Directory (may have been already deleted)"
-                exit 0
-            }
-        }
-        catch {
-            Write-Output "ERROR: Failed to delete computer object from AD: $_"
-            Write-Output "This will cause issues when recreating the server with the same name."
-            exit 1
-        }
+      script: ../files/delete_ad_computer.ps1 -DomainUser "{{ domain_admin_user }}" -DomainPassword "{{ domain_admin_password }}" -ComputerName "{{ computer_name.stdout | trim }}" -DomainName "{{ domain_name }}"
+      args:
+        executable: powershell.exe
       register: ad_delete_result
       failed_when: ad_delete_result.rc != 0
 
