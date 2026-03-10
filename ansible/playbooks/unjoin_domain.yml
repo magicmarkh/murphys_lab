@@ -27,10 +27,10 @@
 
     - name: Delete computer object from Active Directory using ADSI (BEFORE unjoining)
       win_shell: |
-        $domainUser = "{{ domain_admin_user }}"
-        $domainPassword = "{{ domain_admin_password }}"
-        $computerName = "{{ computer_name.stdout | trim }}"
-        $domainName = "{{ domain_name }}"
+        $domainUser = '{{ domain_admin_user }}'
+        $domainPassword = '{{ domain_admin_password }}'
+        $computerName = '{{ computer_name.stdout | trim }}'
+        $domainName = '{{ domain_name }}'
 
         try {
             # Parse domain name to get DC components (e.g., murphyslab.local -> DC=murphyslab,DC=local)
