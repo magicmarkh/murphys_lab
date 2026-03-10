@@ -25,36 +25,67 @@
       win_shell: $env:COMPUTERNAME
       register: computer_name
 
-    - name: Remove computer from domain
+    - name: Delete computer object from Active Directory using ADSI (BEFORE unjoining)
+      win_shell: |
+        $domainUser = "{{ domain_admin_user }}"
+        $domainPassword = "{{ domain_admin_password }}"
+        $computerName = "{{ computer_name.stdout | trim }}"
+        $domainName = "{{ domain_name }}"
+
+        try {
+            # Parse domain name to get DC components (e.g., murphyslab.local -> DC=murphyslab,DC=local)
+            $dcPath = "DC=" + ($domainName -replace "\.", ",DC=")
+
+            # Create DirectoryEntry with credentials
+            $ldapPath = "LDAP://$domainName/$dcPath"
+            $directoryEntry = New-Object System.DirectoryServices.DirectoryEntry($ldapPath, $domainUser, $domainPassword)
+
+            # Search for the computer object
+            $searcher = New-Object System.DirectoryServices.DirectorySearcher
+            $searcher.SearchRoot = $directoryEntry
+            $searcher.Filter = "(&(objectClass=computer)(cn=$computerName))"
+            $searcher.SearchScope = "Subtree"
+
+            $result = $searcher.FindOne()
+
+            if ($result -ne $null) {
+                # Get the computer object's parent container
+                $computerObject = $result.GetDirectoryEntry()
+                $computerDN = $computerObject.distinguishedName
+
+                # Delete the computer object
+                $computerObject.DeleteTree()
+                $computerObject.CommitChanges()
+
+                Write-Output "Successfully deleted computer object '$computerName' (DN: $computerDN) from Active Directory"
+                exit 0
+            }
+            else {
+                Write-Output "Computer object '$computerName' not found in Active Directory (may have been already deleted)"
+                exit 0
+            }
+        }
+        catch {
+            Write-Output "ERROR: Failed to delete computer object from AD: $_"
+            Write-Output "This will cause issues when recreating the server with the same name."
+            exit 1
+        }
+      register: ad_delete_result
+      failed_when: ad_delete_result.rc != 0
+
+    - name: Remove computer from domain (move to workgroup)
       win_domain_membership:
         workgroup_name: WORKGROUP
         domain_admin_user: "{{ domain_admin_user }}"
         domain_admin_password: "{{ domain_admin_password }}"
         state: workgroup
       register: domain_unjoin
+      # Continue even if this fails - AD object is already deleted
+      ignore_errors: yes
 
     - name: Display unjoin result
       debug:
-        msg: "Domain unjoin {{ 'successful' if not domain_unjoin.failed else 'FAILED' }}"
-
-    - name: Delete computer object from Active Directory
-      win_shell: |
-        $username = "{{ domain_admin_user }}"
-        $password = ConvertTo-SecureString "{{ domain_admin_password }}" -AsPlainText -Force
-        $credential = New-Object System.Management.Automation.PSCredential($username, $password)
-
-        try {
-            $computerName = "{{ computer_name.stdout | trim }}"
-            $adComputer = Get-ADComputer -Identity $computerName -Credential $credential -ErrorAction Stop
-            Remove-ADComputer -Identity $computerName -Credential $credential -Confirm:$false -ErrorAction Stop
-            Write-Output "Successfully deleted computer object '$computerName' from Active Directory"
-        }
-        catch {
-            Write-Output "Warning: Could not delete computer object from AD: $_"
-            # Don't fail - the object might already be gone or we don't have permissions
-        }
-      when: not domain_unjoin.failed
-      ignore_errors: yes
+        msg: "Domain unjoin {{ 'successful' if not domain_unjoin.failed else 'FAILED (but AD object was deleted)' }}"
 
     - name: Reboot if required
       win_reboot:

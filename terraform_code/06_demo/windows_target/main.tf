@@ -251,6 +251,7 @@ cd ../../../ansible && ansible-playbook \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'domain_admin_user=${self.triggers_replace.domain_user}' \
   -e 'domain_admin_password="${self.triggers_replace.domain_password}"' \
+  -e 'domain_name=${self.triggers_replace.domain_name}' \
   playbooks/unjoin_domain.yml
 
 UNJOIN_RESULT=$?
