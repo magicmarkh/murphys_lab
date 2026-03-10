@@ -168,6 +168,29 @@ resource "aws_instance" "demo_target" {
 }
 
 # =====================================================================
+# Local Values: Escaped passwords for shell commands
+# =====================================================================
+locals {
+  # Escape special characters in passwords for safe shell interpolation
+  # This handles double quotes, backslashes, and dollar signs
+  admin_password_escaped = replace(
+    replace(
+      replace(random_password.admin_password.result, "\\", "\\\\"),
+      "\"", "\\\""
+    ),
+    "$", "\\$"
+  )
+
+  domain_password_escaped = replace(
+    replace(
+      replace(data.conjur_secret.domain_join_password.value, "\\", "\\\\"),
+      "\"", "\\\""
+    ),
+    "$", "\\$"
+  )
+}
+
+# =====================================================================
 # Domain Join: Ansible Provisioner
 # =====================================================================
 resource "terraform_data" "domain_operations" {
@@ -176,9 +199,9 @@ resource "terraform_data" "domain_operations" {
   triggers_replace = {
     instance_id     = aws_instance.demo_target.id
     instance_ip     = aws_instance.demo_target.private_ip
-    admin_password  = random_password.admin_password.result
+    admin_password  = local.admin_password_escaped
     domain_user     = "${data.conjur_secret.domain_join_username.value}@${var.domain_name}"
-    domain_password = data.conjur_secret.domain_join_password.value
+    domain_password = local.domain_password_escaped
     domain_name     = var.domain_name
     domain_ou_path  = var.domain_ou_path
     hostname        = var.hostname
@@ -193,14 +216,14 @@ resource "terraform_data" "domain_operations" {
 cd ../../../ansible && ansible-playbook \
   -i '${aws_instance.demo_target.private_ip},' \
   -e 'ansible_user=Administrator' \
-  -e 'ansible_password=${random_password.admin_password.result}' \
+  -e 'ansible_password="${local.admin_password_escaped}"' \
   -e 'ansible_connection=winrm' \
   -e 'ansible_port=5985' \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'hostname=${var.hostname}' \
   -e 'domain_join_username=${data.conjur_secret.domain_join_username.value}@${var.domain_name}' \
-  -e 'domain_join_password=${data.conjur_secret.domain_join_password.value}' \
+  -e 'domain_join_password="${local.domain_password_escaped}"' \
   -e 'domain_name=${var.domain_name}' \
   -e 'domain_ou_path=${var.domain_ou_path}' \
   playbooks/onboard_windows_connector.yml
@@ -221,13 +244,13 @@ echo "==============================================================="
 cd ../../../ansible && ansible-playbook \
   -i '${self.triggers_replace.instance_ip},' \
   -e 'ansible_user=Administrator' \
-  -e 'ansible_password=${self.triggers_replace.admin_password}' \
+  -e 'ansible_password="${self.triggers_replace.admin_password}"' \
   -e 'ansible_connection=winrm' \
   -e 'ansible_port=5985' \
   -e 'ansible_winrm_scheme=http' \
   -e 'ansible_winrm_server_cert_validation=ignore' \
   -e 'domain_admin_user=${self.triggers_replace.domain_user}' \
-  -e 'domain_admin_password=${self.triggers_replace.domain_password}' \
+  -e 'domain_admin_password="${self.triggers_replace.domain_password}"' \
   playbooks/unjoin_domain.yml
 
 UNJOIN_RESULT=$?
