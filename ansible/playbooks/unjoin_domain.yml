@@ -26,9 +26,14 @@
       register: computer_name
 
     - name: Delete computer object from Active Directory using ADSI (BEFORE unjoining)
-      script: ../files/delete_ad_computer.ps1 -DomainUser "{{ domain_admin_user }}" -DomainPassword "{{ domain_admin_password }}" -ComputerName "{{ computer_name.stdout | trim }}" -DomainName "{{ domain_name }}"
+      script: ../files/delete_ad_computer.ps1
       args:
         executable: powershell.exe
+      environment:
+        DOMAIN_USER: "{{ domain_admin_user }}"
+        DOMAIN_PASSWORD: "{{ domain_admin_password }}"
+        COMPUTER_NAME: "{{ computer_name.stdout | trim }}"
+        DOMAIN_NAME: "{{ domain_name }}"
       register: ad_delete_result
       failed_when: ad_delete_result.rc != 0
 

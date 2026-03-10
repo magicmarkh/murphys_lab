@@ -1,16 +1,13 @@
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$DomainUser,
+# Read parameters from environment variables to avoid quoting issues
+$DomainUser = $env:DOMAIN_USER
+$DomainPassword = $env:DOMAIN_PASSWORD
+$ComputerName = $env:COMPUTER_NAME
+$DomainName = $env:DOMAIN_NAME
 
-    [Parameter(Mandatory=$true)]
-    [string]$DomainPassword,
-
-    [Parameter(Mandatory=$true)]
-    [string]$ComputerName,
-
-    [Parameter(Mandatory=$true)]
-    [string]$DomainName
-)
+if ([string]::IsNullOrEmpty($DomainUser) -or [string]::IsNullOrEmpty($DomainPassword) -or [string]::IsNullOrEmpty($ComputerName) -or [string]::IsNullOrEmpty($DomainName)) {
+    Write-Output "ERROR: Required environment variables not set (DOMAIN_USER, DOMAIN_PASSWORD, COMPUTER_NAME, DOMAIN_NAME)"
+    exit 1
+}
 
 try {
     # Parse domain name to get DC components (e.g., murphyslab.local -> DC=murphyslab,DC=local)
