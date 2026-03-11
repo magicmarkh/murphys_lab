@@ -43,6 +43,25 @@ variable "time_zone" {
   default     = "America/New_York"
 }
 
+variable "from_time" {
+  description = "The date the policy becomes active | pattern: yyyy-MM-ddTHH:mm:ss"
+  type        = string
+  default     = null
+  validation {
+    condition     = var.from_time == null || can(regex("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$", var.from_time))
+    error_message = "fromTime must be null or match the pattern yyyy-MM-ddTHH:mm:ss (e.g., 2025-07-05T12:34:56)."
+  }
+}
+variable "to_time" {
+  description = "The date the policy expires. | pattern: yyyy-MM-ddTHH:mm:ss"
+  type        = string
+  default     = null
+  validation {
+    condition     = var.to_time == null || can(regex("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$", var.to_time))
+    error_message = "to_time must be null or match the pattern yyyy-MM-ddTHH:mm:ss (e.g., 2026-07-05T12:34:56)."
+  }
+}
+
 # Principals
 variable "principals" {
   type = list(object({
