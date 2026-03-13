@@ -1,0 +1,132 @@
+# ===========================
+# General Configuration
+# ===========================
+variable "asset_owner_name" {
+  description = "Name of the human that the cloud team can contact with questions"
+  type        = string
+}
+
+variable "region" {
+  description = "AWS cloud region for the deployment"
+  type        = string
+  default     = "us-east-2"
+}
+
+variable "team_name" {
+  description = "Cloud naming identifier"
+  type        = string
+  default     = "us-ent-east"
+}
+
+variable "iScheduler" {
+  description = "iScheduler tag for automated shutdown"
+  type        = string
+  default     = "US_E_office"
+}
+
+# ===========================
+# Instance Configuration
+# ===========================
+variable "hostname" {
+  description = "Hostname for the Linux target instance"
+  type        = string
+  default     = "linux-target-1"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t3a.small"
+}
+
+variable "key_name" {
+  description = "Name of the SSH key pair for EC2 instance access"
+  type        = string
+  default     = "us-ent-east-key"
+}
+
+# ===========================
+# Remote State Configuration
+# ===========================
+variable "state_bucket" {
+  description = "S3 bucket name for Terraform remote state"
+  type        = string
+  default     = "us-ent-east"
+}
+
+variable "state_region" {
+  description = "AWS region for S3 state bucket"
+  type        = string
+  default     = "us-east-2"
+}
+
+variable "foundation_state_key" {
+  description = "S3 key for foundation layer state"
+  type        = string
+  default     = "terraform/foundation.tfstate"
+}
+
+# ===========================
+# CyberArk SSH Key Configuration
+# ===========================
+variable "target_user" {
+  description = "Linux user account for SSH key management"
+  type        = string
+  default     = "ec2-user"
+}
+
+variable "connector_id" {
+  description = "CyberArk connector ID for SSH access"
+  type        = string
+}
+
+# ===========================
+# Conjur Configuration
+# ===========================
+variable "conjur_appliance_url" {
+  description = "URL of the Conjur appliance"
+  type        = string
+  default     = "https://murphyslab.secretsmgr.cyberark.cloud/api"
+}
+
+variable "conjur_account" {
+  description = "Conjur account name"
+  type        = string
+  default     = "conjur"
+}
+
+variable "conjur_login" {
+  description = "Conjur login name"
+  type        = string
+  default     = "host/data/murphys-tf"
+}
+
+variable "conjur_api_key" {
+  description = "Conjur API key for the specified login"
+  type        = string
+  sensitive   = true
+}
+
+variable "conjur_identity_client_id_path" {
+  description = "Conjur secret path for Identity client ID"
+  type        = string
+  default     = "data/your/conjur/path"
+}
+
+variable "conjur_identity_client_secret_path" {
+  description = "Conjur secret path for Identity client secret"
+  type        = string
+  default     = "data/your/conjur/path"
+}
+
+variable "conjur_aws_access_key_path" {
+  description = "Conjur secret path for AWS Access Key ID"
+  type        = string
+  default     = "data/your/conjur/path"
+}
+
+variable "conjur_aws_secret_key_path" {
+  description = "Conjur secret path for AWS Secret Access Key"
+  type        = string
+  default     = "data/your/conjur/path"
+}
