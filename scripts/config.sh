@@ -30,6 +30,7 @@ TERRAFORM_CODE_DIRS=(
     "05_cyberark_config/accounts/windows"
     "05_cyberark_config/accounts/cloud"
     "06_demo/windows_target"
+    "06_demo/linux_target"
 )
 
 # Example directories to process
