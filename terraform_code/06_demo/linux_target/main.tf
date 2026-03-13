@@ -139,10 +139,4 @@ resource "idsec_sia_ssh_public_key" "demo_linux_target_key" {
 
   depends_on = [aws_instance.demo_linux_target]
 
-  lifecycle {
-    ignore_changes = [
-      public_key_id,
-      fingerprint
-    ]
-  }
 }
