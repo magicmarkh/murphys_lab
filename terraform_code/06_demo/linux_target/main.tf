@@ -102,8 +102,7 @@ resource "aws_instance" "demo_linux_target" {
   associate_public_ip_address = false
   key_name                    = var.key_name
   vpc_security_group_ids = [
-    data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id,
-    data.terraform_remote_state.foundation.outputs.sia_linux_target_sg_id
+    data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
   ]
 
   root_block_device {
