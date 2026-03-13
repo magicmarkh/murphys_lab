@@ -134,7 +134,7 @@ resource "aws_instance" "demo_linux_target" {
 resource "idsec_sia_ssh_public_key" "demo_linux_target_key" {
   target_machine = aws_instance.demo_linux_target.private_ip
   username = "ec2-user"
-  private_key_path = "../keys/demo_linux_target_key.pem"
+  private_key_path = "../../03_ec2_compute/key_pair/us-ent-east-key.pem"
 
   depends_on = [aws_instance.demo_linux_target]
 
