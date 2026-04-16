@@ -3,7 +3,7 @@ terraform {
   required_providers {
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.1.18"
+      version = "~> 0.2.3"
     }
     conjur = {
       source  = "cyberark/conjur"
