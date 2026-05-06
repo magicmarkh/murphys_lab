@@ -303,11 +303,8 @@ resource "idsec_pcloud_account" "demo_target_admin" {
       secret,                         # CPM rotates passwords after initial creation
       name,                           # CyberArk manages naming
       account_id,                     # Assigned by CyberArk
-      created_time,                   # Timestamp management
-      category_modification_time,     # Category updates
       secret_type,                    # Computed by CyberArk
-      platform_account_properties,    # Platform-specific settings
-      status                          # Account status
+      platform_account_properties    # Platform-specific settings
     ]
   }
 }

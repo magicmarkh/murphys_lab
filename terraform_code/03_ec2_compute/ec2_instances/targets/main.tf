@@ -9,6 +9,11 @@ resource "aws_instance" "linux_target_1" {
   iam_instance_profile        = var.ec2_tf_automation_instance_profile_name
   disable_api_termination     = true
 
+  root_block_device {
+    volume_size = 15
+    volume_type = "gp3"
+  }
+
   user_data                   = <<-EOF
     #!/bin/bash -xe
 
