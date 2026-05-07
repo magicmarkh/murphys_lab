@@ -1,0 +1,270 @@
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.cce_aws_organization.idsec_cce_aws_organization.create_org[0] will be created
+  + resource "idsec_cce_aws_organization" "create_org" {
+      + cross_account_role_external_id = "CCE-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+      + display_name                   = (known after apply)
+      + id                             = (known after apply)
+      + last_successful_scan           = (known after apply)
+      + management_account_id          = "128327517575"
+      + onboarding_type                = (known after apply)
+      + organization_display_name      = "jdesec2"
+      + organization_id                = "o-1ntwuyrlog"
+      + organization_root_id           = "r-7n43"
+      + parameters                     = (known after apply)
+      + region                         = (known after apply)
+      + scan_organization_role_arn     = (known after apply)
+      + service_parameters             = (known after apply)
+      + services                       = [
+          + {
+              + resources    = {
+                  + scaPowerRoleArn = (known after apply)
+                  + ssoEnable       = "false"
+                  + ssoRegion       = null
+                }
+              + service_name = "sca"
+            },
+        ]
+      + status                         = (known after apply)
+    }
+
+  # module.cce_aws_organization.terraform_data.validate_management_account[0] will be created
+  + resource "terraform_data" "validate_management_account" {
+      + id     = (known after apply)
+      + input  = true
+      + output = (known after apply)
+    }
+
+  # module.cce_aws_organization.time_sleep.wait_for_modules[0] will be created
+  + resource "time_sleep" "wait_for_modules" {
+      + create_duration = "10s"
+      + id              = (known after apply)
+    }
+
+  # module.cce_aws_organization.module.cce[0].aws_iam_policy.cce_org_scan_policy will be created
+  + resource "aws_iam_policy" "cce_org_scan_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Policy to allow scanning the organization and list accounts"
+      + id               = (known after apply)
+      + name             = (known after apply)
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = [
+                          + "organizations:List*",
+                          + "organizations:Describe*",
+                          + "cloudformation:Describe*",
+                          + "cloudformation:Get*",
+                          + "cloudformation:List*",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags_all         = (known after apply)
+    }
+
+  # module.cce_aws_organization.module.cce[0].aws_iam_role.cce_org_scan_role will be created
+  + resource "aws_iam_role" "cce_org_scan_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "organizations.amazonaws.com"
+                        }
+                    },
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Condition = {
+                          + StringEquals = {
+                              + "sts:ExternalId" = "CCE-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+                            }
+                        }
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::871697792279:root"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.cce_aws_organization.module.cce[0].aws_iam_role_policy_attachment.cce_org_scan_attach will be created
+  + resource "aws_iam_role_policy_attachment" "cce_org_scan_attach" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = (known after apply)
+    }
+
+  # module.cce_aws_organization.module.cce[0].random_uuid.suffix will be created
+  + resource "random_uuid" "suffix" {
+      + id     = (known after apply)
+      + result = (known after apply)
+    }
+
+  # module.cce_aws_organization.module.sca[0].aws_iam_policy.cyberark_account_permissions_policy[0] will be created
+  + resource "aws_iam_policy" "cyberark_account_permissions_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "The policy contains sca IAM account permissions"
+      + id               = (known after apply)
+      + name             = "CyberarkIAMAccountPermissionsPolicyForSCA128327517575-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = [
+                          + "iam:UpdateAssumeRolePolicy",
+                          + "iam:PutRolePolicy",
+                          + "iam:ListSAMLProviders",
+                          + "iam:ListRoles",
+                          + "iam:ListRolePolicies",
+                          + "iam:ListAttachedRolePolicies",
+                          + "iam:GetSAMLProvider",
+                          + "iam:GetRolePolicy",
+                          + "iam:GetRole",
+                          + "iam:GetPolicyVersion",
+                          + "iam:GetPolicy",
+                          + "iam:DeleteRolePolicy",
+                          + "iam:CreateSAMLProvider",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                      + Sid      = "scapolicyaccountpermissions"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags_all         = (known after apply)
+    }
+
+  # module.cce_aws_organization.module.sca[0].aws_iam_policy.cyberark_sca_cross_account_policy will be created
+  + resource "aws_iam_policy" "cyberark_sca_cross_account_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "The policy contains sca cross account permissions"
+      + id               = (known after apply)
+      + name             = "CyberArkPolicyAccountForSCA128327517575-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = "sts:TagSession"
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                      + Sid      = "scapolicyallowtag"
+                    },
+                  + {
+                      + Action   = [
+                          + "sts:SetSourceIdentity",
+                          + "sts:AssumeRole",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                      + Sid      = "AssumeCustomerRole"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags_all         = (known after apply)
+    }
+
+  # module.cce_aws_organization.module.sca[0].aws_iam_role.cyberark_sca_cross_account_assume_role will be created
+  + resource "aws_iam_role" "cyberark_sca_cross_account_assume_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Condition = {
+                          + StringLike = {
+                              + "aws:PrincipalArn" = [
+                                  + "arn:aws:iam::244175932815:role/sca-provision-role*",
+                                  + "arn:aws:iam::244175932815:role/sca-provision-role-prod",
+                                ]
+                              + "sts:ExternalId"   = "ab00bb36-13f4-4d47-8a51-2ab147ce9a27-*"
+                            }
+                        }
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::244175932815:root"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "CyberArkRoleSCA128327517575-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.cce_aws_organization.module.sca[0].aws_iam_role_policy_attachment.cyberark_sca_cross_account_role_attached_to_account_permissions_policy[0] will be created
+  + resource "aws_iam_role_policy_attachment" "cyberark_sca_cross_account_role_attached_to_account_permissions_policy" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "CyberArkRoleSCA128327517575-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+    }
+
+  # module.cce_aws_organization.module.sca[0].aws_iam_role_policy_attachment.cyberark_sca_cross_account_role_attached_to_policy will be created
+  + resource "aws_iam_role_policy_attachment" "cyberark_sca_cross_account_role_attached_to_policy" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "CyberArkRoleSCA128327517575-ab00bb36-13f4-4d47-8a51-2ab147ce9a27"
+    }
+
+Plan: 12 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + cce_scan_role_arn     = (known after apply)
+  + management_account_id = "128327517575"
+  + org_onboarding_id     = (known after apply)
+  + organization_id       = "o-1ntwuyrlog"
+  + sca_role_arn          = (known after apply)

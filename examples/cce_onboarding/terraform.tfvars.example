@@ -1,0 +1,28 @@
+# ===========================
+# CyberArk Identity Security Platform Credentials
+# ===========================
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars to version control.
+idsec_service_user  = "svc_user@cyberark.cloud.XXXXX"
+idsec_service_token = "REPLACE_WITH_SERVICE_TOKEN"
+
+# ===========================
+# AWS Configuration
+# ===========================
+aws_region = "us-east-2"
+
+# ===========================
+# AWS Organization Configuration
+# ===========================
+organization_id       = "o-XXXXXXXXXX"
+management_account_id = "123456789012"
+organization_root_id  = "r-XXXX"
+display_name          = "My Organization"
+
+# ===========================
+# Service Feature Flags
+# ===========================
+enable_sca     = true
+enable_sia     = false
+sca_sso_enable = false
+# sca_sso_region = "us-east-1"  # Required when sca_sso_enable = true

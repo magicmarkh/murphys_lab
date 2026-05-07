@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  CyberArk CCE member account IAM roles for SCA and SIA services.
+  Deployed via CloudFormation StackSets from the management account.
+
+Parameters:
+  TenantId:
+    Type: String
+    Description: CyberArk tenant ID
+  DPAServiceAccountId:
+    Type: String
+    Description: AWS account ID for the DPA/SIA service
+    Default: ''
+  SCAServiceAccountId:
+    Type: String
+    Description: AWS account ID for the SCA service
+    Default: ''
+  ServiceStage:
+    Type: String
+    Description: SCA service stage identifier
+    Default: ''
+  SCARoleName:
+    Type: String
+    Description: IAM role name for SCA (must match the org power role name)
+    Default: ''
+  OrgAccountId:
+    Type: String
+    Description: Management account ID (used in policy naming)
+    Default: ''
+  EnableSIA:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'false'
+  EnableSCA:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+  SSOEnable:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'false'
+
+Conditions:
+  CreateSIAResources: !Equals [!Ref EnableSIA, 'true']
+  CreateSCAResources: !And
+    - !Equals [!Ref EnableSCA, 'true']
+    - !Equals [!Ref SSOEnable, 'false']
+
+Resources:
+  # ===========================
+  # SIA (Secure Infrastructure Access) Resources
+  # ===========================
+  SIARole:
+    Type: AWS::IAM::Role
+    Condition: CreateSIAResources
+    Properties:
+      RoleName: !Sub
+        - 'CyberArkSIA-${Suffix}'
+        - Suffix: !Select [0, !Split ['-', !Select [2, !Split ['/', !Ref 'AWS::StackId']]]]
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${DPAServiceAccountId}:root'
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref TenantId
+              StringLike:
+                'aws:PrincipalArn': !Sub 'arn:aws:iam::${DPAServiceAccountId}:role/DiscoveryServiceRole*'
+
+  SIAPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: CreateSIAResources
+    Properties:
+      ManagedPolicyName: !Sub
+        - 'CyberarkJitAccountProvisioningPolicy-${TenantPrefix}-${Suffix}'
+        - TenantPrefix: !Select [0, !Split ['-', !Ref TenantId]]
+          Suffix: !Select [0, !Split ['-', !Select [2, !Split ['/', !Ref 'AWS::StackId']]]]
+      Description: Allows EC2 instance and region scan
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'ec2:DescribeInstances'
+              - 'ec2:DescribeRegions'
+            Resource: '*'
+      Roles:
+        - !Ref SIARole
+
+  # ===========================
+  # SCA (Secure Cloud Access) Resources
+  # Created only when SCA is enabled and SSO is disabled
+  # ===========================
+  SCACrossAccountRole:
+    Type: AWS::IAM::Role
+    Condition: CreateSCAResources
+    Properties:
+      RoleName: !Ref SCARoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${SCAServiceAccountId}:role/sca-provision-role-${ServiceStage}'
+            Action: 'sts:AssumeRole'
+            Condition:
+              ForAnyValue:StringEquals:
+                'sts:ExternalId': !Sub '${TenantId}-${AWS::AccountId}'
+
+  SCACrossAccountPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: CreateSCAResources
+    Properties:
+      ManagedPolicyName: !Sub 'CyberArkPolicyAccountForSCA${OrgAccountId}-${TenantId}'
+      Description: SCA cross account permissions
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: scapolicyallowtag
+            Effect: Allow
+            Action: 'sts:TagSession'
+            Resource: '*'
+          - Sid: AssumeCustomerRole
+            Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+              - 'sts:SetSourceIdentity'
+            Resource: '*'
+      Roles:
+        - !Ref SCACrossAccountRole
+
+  SCAAccountPermissionsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: CreateSCAResources
+    Properties:
+      ManagedPolicyName: !Sub 'CyberarkIAMAccountPermissionsPolicyForSCA${OrgAccountId}-${TenantId}'
+      Description: SCA IAM account permissions
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: scapolicyaccountpermissions
+            Effect: Allow
+            Action:
+              - 'iam:UpdateAssumeRolePolicy'
+              - 'iam:ListSAMLProviders'
+              - 'iam:DeleteRolePolicy'
+              - 'iam:PutRolePolicy'
+              - 'iam:GetRolePolicy'
+              - 'iam:GetSAMLProvider'
+              - 'iam:GetRole'
+              - 'iam:ListRoles'
+              - 'iam:ListAttachedRolePolicies'
+              - 'iam:GetPolicy'
+              - 'iam:GetPolicyVersion'
+              - 'iam:ListRolePolicies'
+              - 'iam:CreateSAMLProvider'
+            Resource: '*'
+      Roles:
+        - !Ref SCACrossAccountRole
+
+Outputs:
+  SIARoleArn:
+    Condition: CreateSIAResources
+    Value: !GetAtt SIARole.Arn
+    Description: SIA role ARN in this account
+  SCARoleArn:
+    Condition: CreateSCAResources
+    Value: !GetAtt SCACrossAccountRole.Arn
+    Description: SCA role ARN in this account
