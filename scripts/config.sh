@@ -29,6 +29,7 @@ TERRAFORM_CODE_DIRS=(
     "05_cyberark_config/accounts/linux"
     "05_cyberark_config/accounts/windows"
     "05_cyberark_config/accounts/cloud"
+    "06_aws_cce_config"
     "99_demo/windows_target"
     "99_demo/linux_target"
 )
