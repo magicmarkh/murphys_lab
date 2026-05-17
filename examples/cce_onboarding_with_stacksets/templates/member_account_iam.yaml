@@ -42,9 +42,7 @@ Parameters:
 
 Conditions:
   CreateSIAResources: !Equals [!Ref EnableSIA, 'true']
-  CreateSCAResources: !And
-    - !Equals [!Ref EnableSCA, 'true']
-    - !Equals [!Ref SSOEnable, 'false']
+  CreateSCAResources: !Equals [!Ref EnableSCA, 'true']
 
 Resources:
   # ===========================
