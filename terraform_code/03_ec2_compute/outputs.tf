@@ -6,12 +6,6 @@ output "key_name" {
   value       = module.key_pair.key_name
 }
 
-output "private_key_pem" {
-  description = "Private key in PEM format"
-  value       = module.key_pair.private_key_pem
-  sensitive   = true
-}
-
 # Commented out - modules don't export these outputs yet
 # output "key_pair_id" {
 #   description = "ID of the SSH key pair"

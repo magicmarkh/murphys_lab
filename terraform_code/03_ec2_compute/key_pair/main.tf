@@ -21,11 +21,3 @@ resource "aws_key_pair" "server" {
   }
 }
 
-resource "local_file" "private_key_pem" {
-  content  = tls_private_key.server.private_key_pem
-  filename = "${path.module}/${var.server_key_name}.pem"
-
-  lifecycle {
-    ignore_changes = all
-  }
-}
