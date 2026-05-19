@@ -74,9 +74,10 @@ variable "linux_connector_name_prefix" {
 #  type        = string#
 #}
 
-variable "private_key_path" {
-  description = "Path to the private key file for SSH access"
+variable "private_key_contents" {
+  description = "Private key contents for SSH access (retrieved from Conjur)"
   type        = string
+  sensitive   = true
 }
 
 # ===========================

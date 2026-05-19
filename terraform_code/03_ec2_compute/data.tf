@@ -31,6 +31,11 @@ data "conjur_secret" "aws_secret_key" {
   name = var.conjur_aws_secret_key_path
 }
 
+# AWS PEM key for SSH access
+data "conjur_secret" "aws_pem_key" {
+  name = var.conjur_aws_pem_key_path
+}
+
 # =====================================================================
 # Remote State Data Sources
 # =====================================================================

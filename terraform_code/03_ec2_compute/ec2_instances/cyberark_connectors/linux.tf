@@ -42,13 +42,13 @@ resource "aws_instance" "sia_linux_aws_connector" {
 resource "idsec_sia_access_connector" "linux_connector" {
   count = var.linux_connector_count
 
-  connector_type    = "AWS"
-  connector_os      = "linux"
-  connector_pool_id = var.connector_pool_id
-  target_machine    = aws_instance.sia_linux_aws_connector[count.index].private_ip
-  username          = "ec2-user"
-  private_key_path  = var.private_key_path
-  depends_on        = [aws_instance.sia_linux_aws_connector]
+  connector_type       = "AWS"
+  connector_os         = "linux"
+  connector_pool_id    = var.connector_pool_id
+  target_machine       = aws_instance.sia_linux_aws_connector[count.index].private_ip
+  username             = "ec2-user"
+  private_key_contents = var.private_key_contents
+  depends_on           = [aws_instance.sia_linux_aws_connector]
 
   lifecycle {
     ignore_changes = [

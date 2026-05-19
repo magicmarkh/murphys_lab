@@ -130,3 +130,9 @@ variable "conjur_aws_secret_key_path" {
   type        = string
   default     = "data/your/conjur/path"
 }
+
+variable "conjur_aws_pem_key_path" {
+  description = "Conjur secret path for AWS PEM key for SSH access"
+  type        = string
+  default     = ""
+}

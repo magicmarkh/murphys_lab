@@ -131,7 +131,7 @@ module "cyberark_connectors" {
   linux_connector_count            = var.linux_connector_count
   linux_connector_hostname_prefix  = var.linux_connector_hostname_prefix
   linux_connector_name_prefix      = var.linux_connector_name_prefix
-  private_key_path                 = module.key_pair.private_key_path
+  private_key_contents             = data.conjur_secret.aws_pem_key.value
 
   #connector3 testing
   domain_name          = var.domain_name
