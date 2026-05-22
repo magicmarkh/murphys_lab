@@ -175,18 +175,24 @@ locals {
   # This handles double quotes, backslashes, and dollar signs
   admin_password_escaped = replace(
     replace(
-      replace(random_password.admin_password.result, "\\", "\\\\"),
-      "\"", "\\\""
+      replace(
+        replace(random_password.admin_password.result, "\\", "\\\\"),
+        "\"", "\\\""
+      ),
+      "$", "\\$"
     ),
-    "$", "\\$"
+    "'", "'\\''"
   )
 
   domain_password_escaped = replace(
     replace(
-      replace(data.conjur_secret.domain_join_password.value, "\\", "\\\\"),
-      "\"", "\\\""
+      replace(
+        replace(data.conjur_secret.domain_join_password.value, "\\", "\\\\"),
+        "\"", "\\\""
+      ),
+      "$", "\\$"
     ),
-    "$", "\\$"
+    "'", "'\\''"
   )
 }
 
