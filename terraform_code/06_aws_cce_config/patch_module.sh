@@ -33,7 +33,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = ">= 0.1.3"
+      version = ">= 0.3.3"
     }
     time = {
       source  = "hashicorp/time"
