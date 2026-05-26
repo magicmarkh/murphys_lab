@@ -1,0 +1,41 @@
+# =============================================================================
+# data/vault/m-aws-pem-unmanaged - PCloud safe sync
+# =============================================================================
+# Loaded into branch: data/vault
+#   conjur policy load -b data/vault data/vault/m-aws-pem-unmanaged.yml
+#
+# Holds unmanaged PEM key material for AWS EC2 access (key rotation handled
+# outside CyberArk).
+# =============================================================================
+
+- !policy
+  id: m-aws-pem-unmanaged
+  body:
+    # -------------------------------------------------------------------------
+    # Account: aws-us-ent-east-key-pem
+    # -------------------------------------------------------------------------
+    - !policy
+      id: aws-us-ent-east-key-pem
+      body:
+        - !variable address
+        - !variable password
+        - !variable username
+
+    # -------------------------------------------------------------------------
+    # Delegation
+    # -------------------------------------------------------------------------
+    - !policy
+      id: delegation
+      body:
+        - !group
+          id: consumers
+          annotations:
+            description: Workloads permitted to read m-aws-pem-unmanaged secrets.
+
+    - !permit
+      role: !group delegation/consumers
+      privileges: [ read, execute ]
+      resources:
+        - !variable aws-us-ent-east-key-pem/address
+        - !variable aws-us-ent-east-key-pem/password
+        - !variable aws-us-ent-east-key-pem/username

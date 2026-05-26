@@ -1,0 +1,15 @@
+# =============================================================================
+# Azure Authenticator
+# =============================================================================
+# Loaded into branch: conjur
+#   conjur policy load -b conjur conjur/authn-azure.yml
+#
+# Per-tenant Azure authenticators should be added as nested !policy entries
+# under this branch with their own webservice, variables, and consumer group.
+# =============================================================================
+
+- !policy
+  id: authn-azure
+  annotations:
+    description: Parent policy for all Azure authenticator service-ids.
+  body: []

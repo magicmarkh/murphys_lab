@@ -1,0 +1,132 @@
+# =============================================================================
+# Root Policy
+# =============================================================================
+# Loaded into branch: root
+#   conjur policy load -b root root.yml
+#
+# Declares:
+#   - All human users in the @murphys.cloud domain
+#   - Root-level groups (Conjur_Cloud_Admins, Conjur_Cloud_Users, "SE East Majors")
+#   - Top-level !policy stubs for the `conjur` and `data` branches.
+#     Sub-policies for each branch are loaded separately (see load-policy.sh).
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Human Users
+# -----------------------------------------------------------------------------
+- !user
+  id: brendan.walsh@murphys.cloud
+
+- !user
+  id: brett.monk@murphys.cloud
+
+- !user
+  id: eric.valli@murphys.cloud
+
+- !user
+  id: joshua.clark@murphys.cloud
+
+- !user
+  id: mark.hurter@murphys.cloud
+
+- !user
+  id: nicholas.salvo@murphys.cloud
+
+- !user
+  id: serena.lelah@murphys.cloud
+
+- !user
+  id: steven.james@murphys.cloud
+
+- !user
+  id: travis.evans@murphys.cloud
+
+- !user
+  id: trevor.forster@murphys.cloud
+
+- !user
+  id: tyler.reese@murphys.cloud
+
+- !user
+  id: william.tillson@murphys.cloud
+
+# -----------------------------------------------------------------------------
+# Root-level Groups
+# -----------------------------------------------------------------------------
+- !group
+  id: Conjur_Cloud_Admins
+  annotations:
+    description: Tenant administrators for Conjur Cloud.
+
+- !group
+  id: Conjur_Cloud_Users
+  annotations:
+    description: General Conjur Cloud users (read-only baseline).
+
+- !group
+  id: SE East Majors
+  annotations:
+    description: SE East Majors team membership.
+
+# -----------------------------------------------------------------------------
+# Root-level Group Memberships
+# -----------------------------------------------------------------------------
+- !grant
+  role: !group Conjur_Cloud_Admins
+  members:
+    - !user mark.hurter@murphys.cloud
+    - !user brendan.walsh@murphys.cloud
+    - !user joshua.clark@murphys.cloud
+
+- !grant
+  role: !group Conjur_Cloud_Users
+  members:
+    - !user brett.monk@murphys.cloud
+    - !user eric.valli@murphys.cloud
+    - !user nicholas.salvo@murphys.cloud
+    - !user serena.lelah@murphys.cloud
+    - !user steven.james@murphys.cloud
+    - !user travis.evans@murphys.cloud
+    - !user trevor.forster@murphys.cloud
+    - !user tyler.reese@murphys.cloud
+    - !user william.tillson@murphys.cloud
+
+- !grant
+  role: !group SE East Majors
+  members:
+    - !user mark.hurter@murphys.cloud
+    - !user trevor.forster@murphys.cloud
+    - !user brendan.walsh@murphys.cloud
+
+# -----------------------------------------------------------------------------
+# Top-level Policy Branches
+# -----------------------------------------------------------------------------
+# The bodies are intentionally empty. Sub-policies are loaded into each branch
+# individually so that ownership/scope can be managed per branch.
+- !policy
+  id: conjur
+  owner: !group Conjur_Cloud_Admins
+  annotations:
+    description: System policies (authenticators, issuers).
+  body: []
+
+- !policy
+  id: data
+  owner: !group Conjur_Cloud_Admins
+  annotations:
+    description: Application data policies (vault safes, terraform, swa, etc.).
+  body: []
+
+# -----------------------------------------------------------------------------
+# authn-oidc/cyberark - referenced webservice (managed by Conjur Cloud)
+# -----------------------------------------------------------------------------
+# Conjur Cloud manages the OIDC authenticator for the tenant. The webservice
+# below is declared here to keep the policy-as-code repo complete.
+- !policy
+  id: conjur/authn-oidc
+  owner: !group Conjur_Cloud_Admins
+  body:
+    - !webservice
+      id: cyberark
+      annotations:
+        description: OIDC authenticator used by the CyberArk Identity tenant.

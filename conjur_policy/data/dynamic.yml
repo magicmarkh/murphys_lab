@@ -1,0 +1,16 @@
+# =============================================================================
+# data/dynamic
+# =============================================================================
+# Loaded into branch: data
+#   conjur policy load -b data data/dynamic.yml
+#
+# Container for dynamic-secret resources (linked to issuers registered under
+# conjur/issuers). Individual dynamic secret resources are added here as
+# !variable entries with the appropriate issuer annotation.
+# =============================================================================
+
+- !policy
+  id: dynamic
+  annotations:
+    description: Dynamic secrets produced via registered issuers.
+  body: []
