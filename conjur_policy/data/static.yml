@@ -1,0 +1,15 @@
+# =============================================================================
+# data/static
+# =============================================================================
+# Loaded into branch: data
+#   conjur policy load -b data data/static.yml
+#
+# Container for statically-managed (non-vault, non-issuer) secrets.
+# Variables are added under this branch as needed.
+# =============================================================================
+
+- !policy
+  id: static
+  annotations:
+    description: Statically-defined secrets managed directly in Conjur.
+  body: []

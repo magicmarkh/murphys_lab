@@ -1,0 +1,61 @@
+# =============================================================================
+# data/terraform
+# =============================================================================
+# Loaded into branch: data
+#   conjur policy load -b data data/terraform.yml
+#
+# Variables consumed by Terraform automation (AWS provider creds, CyberArk
+# Identity client credentials, ISPSS credentials).
+# =============================================================================
+
+- !policy
+  id: terraform
+  body:
+    # -------------------------------------------------------------------------
+    # Host that the Terraform automation runner authenticates as
+    # -------------------------------------------------------------------------
+    - !host
+      id: terraform-host
+      annotations:
+        description: Host identity used by Terraform runners.
+
+    # -------------------------------------------------------------------------
+    # AWS provider credentials
+    # -------------------------------------------------------------------------
+    - !policy
+      id: aws
+      body:
+        - !variable access_key_id
+        - !variable secret_access_key
+
+    # -------------------------------------------------------------------------
+    # CyberArk Identity OAuth client credentials
+    # -------------------------------------------------------------------------
+    - !policy
+      id: cyberark
+      body:
+        - !variable client_id
+        - !variable client_secret
+
+    # -------------------------------------------------------------------------
+    # ISPSS / IdSec API credentials
+    # -------------------------------------------------------------------------
+    - !policy
+      id: idsec
+      body:
+        - !variable username
+        - !variable password
+
+    # -------------------------------------------------------------------------
+    # Grant the terraform host read/execute on all sub-variables
+    # -------------------------------------------------------------------------
+    - !permit
+      role: !host terraform-host
+      privileges: [ read, execute ]
+      resources:
+        - !variable aws/access_key_id
+        - !variable aws/secret_access_key
+        - !variable cyberark/client_id
+        - !variable cyberark/client_secret
+        - !variable idsec/username
+        - !variable idsec/password
