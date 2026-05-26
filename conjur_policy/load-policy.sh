@@ -2,15 +2,13 @@
 # =============================================================================
 # load-policy.sh
 # =============================================================================
-# Loads every policy file in this repo into Conjur in dependency order:
+# Loads every policy file in this repo into Conjur Cloud in dependency order:
 #
-#   1. root.yml                         -> root
-#   2. conjur/*.yml                     -> conjur
-#   3. data/data.yml                    -> root
-#   4. data/{terraform,static,dynamic,swa}.yml
+#   1. data/data.yml                    -> data
+#   2. data/{terraform,static,dynamic,swa}.yml
 #                                       -> data
-#   5. data/vault/vault.yml             -> data
-#   6. data/vault/<safe>.yml            -> data/vault
+#   3. data/vault/vault.yml             -> data
+#   4. data/vault/<safe>.yml            -> data/vault
 #
 # Requires the Conjur CLI (`conjur`) to be installed, configured, and
 # authenticated against the target tenant.
@@ -54,27 +52,12 @@ run() {
 }
 
 # -----------------------------------------------------------------------------
-# 1. Root - users, root-level groups, top-level !policy stubs
+# 1. data - admin groups, loose hosts, sub-policy stubs
 # -----------------------------------------------------------------------------
-run root root.yml
+run data data/data.yml
 
 # -----------------------------------------------------------------------------
-# 2. conjur/* - authenticators and issuers
-# -----------------------------------------------------------------------------
-run conjur conjur/authn-iam.yml
-run conjur conjur/authn-gcp.yml
-run conjur conjur/authn-jwt.yml
-run conjur conjur/authn-azure.yml
-run conjur conjur/authn-cert.yml
-run conjur conjur/issuers.yml
-
-# -----------------------------------------------------------------------------
-# 3. data - admin groups, loose hosts, sub-policy stubs
-# -----------------------------------------------------------------------------
-run root data/data.yml
-
-# -----------------------------------------------------------------------------
-# 4. data/* - terraform, static, dynamic, swa
+# 2. data/* - terraform, static, dynamic, swa
 # -----------------------------------------------------------------------------
 run data data/terraform.yml
 run data data/static.yml
@@ -82,12 +65,12 @@ run data data/dynamic.yml
 run data data/swa.yml
 
 # -----------------------------------------------------------------------------
-# 5. data/vault - per-safe admin groups + sub-policy stubs
+# 3. data/vault - per-safe admin groups + sub-policy stubs
 # -----------------------------------------------------------------------------
 run data data/vault/vault.yml
 
 # -----------------------------------------------------------------------------
-# 6. data/vault/<safe> - per-safe accounts, variables, delegation
+# 4. data/vault/<safe> - per-safe accounts, variables, delegation
 # -----------------------------------------------------------------------------
 run data/vault data/vault/m-aws-keys.yml
 run data/vault data/vault/m-aws-pem-unmanaged.yml
