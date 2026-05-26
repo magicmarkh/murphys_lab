@@ -126,7 +126,12 @@ main() {
     echo "=========================================="
     echo ""
     echo "IMPORTANT: Conjur credentials are NOT included in downloaded files."
-    echo "Run './scripts/set_secrets.sh' to populate conjur_login and conjur_api_key."
+    echo "Run './scripts/set_secrets.sh' to configure Conjur authentication."
+    echo "  - Choose 'api' mode for laptop/desktop (API key)"
+    echo "  - Choose 'iam' mode for EC2 instances (AWS IAM)"
+    echo ""
+    echo "NOTE: If the Conjur CLI is installed, ensure CONJURRC=/dev/null is"
+    echo "set in your shell to prevent ~/.conjurrc from interfering with Terraform."
     echo ""
 }
 

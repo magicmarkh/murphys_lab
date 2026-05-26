@@ -54,3 +54,10 @@
           role: !group operators
           privilege: [ read ]
           resource: !webservice status
+
+        # ---------------------------------------------------------------------
+        # Terraform automation host — allowed to authenticate via IAM
+        # ---------------------------------------------------------------------
+        - !grant
+          role: !group apps
+          member: !host /data/murphys-tf

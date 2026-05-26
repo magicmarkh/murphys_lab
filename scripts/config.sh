@@ -14,8 +14,8 @@ export REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 export TFVARS_FILENAME="terraform.tfvars"
 export BACKEND_FILENAME="backend.tf"
 
-# Sensitive field patterns
-SENSITIVE_FIELDS=("conjur_login" "conjur_api_key")
+# Sensitive field patterns (cleared before S3 upload, populated by set_secrets.sh)
+SENSITIVE_FIELDS=("conjur_login" "conjur_api_key" "conjur_service_id" "conjur_host_id")
 
 # Terraform code directories to process
 TERRAFORM_CODE_DIRS=(

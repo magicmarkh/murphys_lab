@@ -32,6 +32,11 @@
           annotations:
             description: Workloads permitted to read m-aws-pem-unmanaged secrets.
 
+    # Grant Terraform automation host access to this safe's secrets
+    - !grant
+      role: !group delegation/consumers
+      member: !host /data/murphys-tf
+
     - !permit
       role: !group delegation/consumers
       privileges: [ read, execute ]

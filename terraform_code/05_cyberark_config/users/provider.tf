@@ -1,7 +1,7 @@
 provider "aws" {
   region     = var.region
-  access_key = data.conjur_secret.aws_access_key.value
-  secret_key = data.conjur_secret.aws_secret_key.value
+  access_key = var.conjur_authn_type == "api" ? data.conjur_secret.aws_access_key[0].value : null
+  secret_key = var.conjur_authn_type == "api" ? data.conjur_secret.aws_secret_key[0].value : null
 }
 
 terraform {
@@ -25,9 +25,15 @@ terraform {
 provider "conjur" {
   appliance_url = var.conjur_appliance_url
   account       = var.conjur_account
-  api_key       = var.conjur_api_key
-  authn_type    = "api"
-  login         = var.conjur_login
+  authn_type    = var.conjur_authn_type == "iam" ? "aws" : "api"
+
+  # API key auth (laptop) — null when using IAM
+  login   = var.conjur_authn_type == "api" ? var.conjur_login : null
+  api_key = var.conjur_authn_type == "api" ? var.conjur_api_key : null
+
+  # IAM auth (EC2) — null when using API key
+  service_id = var.conjur_authn_type == "iam" ? var.conjur_service_id : null
+  host_id    = var.conjur_authn_type == "iam" ? var.conjur_host_id : null
 }
 
 data "conjur_secret" "identity_client_id" {
@@ -39,11 +45,13 @@ data "conjur_secret" "identity_client_secret" {
 }
 
 data "conjur_secret" "aws_access_key" {
-  name = var.conjur_aws_access_key_path
+  count = var.conjur_authn_type == "api" ? 1 : 0
+  name  = var.conjur_aws_access_key_path
 }
 
 data "conjur_secret" "aws_secret_key" {
-  name = var.conjur_aws_secret_key_path
+  count = var.conjur_authn_type == "api" ? 1 : 0
+  name  = var.conjur_aws_secret_key_path
 }
 
 provider "idsec" {

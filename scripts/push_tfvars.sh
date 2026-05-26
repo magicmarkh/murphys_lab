@@ -50,9 +50,13 @@ sanitize_tfvars() {
     cp "${input_file}" "${output_file}"
 
     # Clear sensitive fields using sed
-    # Pattern matches: conjur_login = "..." or conjur_login         = "..."
+    # Pattern matches: field = "..." or field         = "..."
     sed -i.bak -E 's/^(conjur_login[[:space:]]*=[[:space:]]*).*/\1""/' "${output_file}"
     sed -i.bak -E 's/^(conjur_api_key[[:space:]]*=[[:space:]]*).*/\1""/' "${output_file}"
+    sed -i.bak -E 's/^(conjur_service_id[[:space:]]*=[[:space:]]*).*/\1""/' "${output_file}"
+    sed -i.bak -E 's/^(conjur_host_id[[:space:]]*=[[:space:]]*).*/\1""/' "${output_file}"
+    # Reset auth type to default so pulled files start in API mode
+    sed -i.bak -E 's/^(conjur_authn_type[[:space:]]*=[[:space:]]*).*/\1"api"/' "${output_file}"
 
     # Remove backup file
     rm -f "${output_file}.bak"
@@ -153,7 +157,8 @@ main() {
     echo "=========================================="
     echo ""
     echo "WARNING: This will upload sanitized tfvars files to S3."
-    echo "Sensitive fields (conjur_login, conjur_api_key) will be cleared."
+    echo "Sensitive fields (conjur_login, conjur_api_key, conjur_service_id, conjur_host_id) will be cleared."
+    echo "conjur_authn_type will be reset to 'api'."
     echo "backend.tf files will be uploaded as-is."
     echo ""
     read -p "Continue? (yes/no): " confirm

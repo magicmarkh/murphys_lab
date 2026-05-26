@@ -22,13 +22,15 @@ data "conjur_secret" "identity_client_secret" {
   name = var.conjur_identity_client_secret_path
 }
 
-# AWS credentials
+# AWS credentials (only fetched in API mode; IAM mode uses instance role)
 data "conjur_secret" "aws_access_key" {
-  name = var.conjur_aws_access_key_path
+  count = var.conjur_authn_type == "api" ? 1 : 0
+  name  = var.conjur_aws_access_key_path
 }
 
 data "conjur_secret" "aws_secret_key" {
-  name = var.conjur_aws_secret_key_path
+  count = var.conjur_authn_type == "api" ? 1 : 0
+  name  = var.conjur_aws_secret_key_path
 }
 
 # AWS PEM key for SSH access
