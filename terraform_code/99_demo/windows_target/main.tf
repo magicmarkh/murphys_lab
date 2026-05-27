@@ -27,6 +27,7 @@ provider "conjur" {
 
   # IAM auth (EC2) — ignored when using API key
   service_id = var.conjur_authn_type == "iam" ? var.conjur_service_id : null
+  host_id    = var.conjur_authn_type == "iam" ? var.conjur_host_id : null
 }
 
 # =====================================================================
