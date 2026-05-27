@@ -62,8 +62,10 @@ data "conjur_secret" "identity_client_secret" {
 # =====================================================================
 provider "aws" {
   region     = var.region
-  access_key = var.conjur_authn_type == "api" ? data.conjur_secret.aws_access_key[0].value : null
-  secret_key = var.conjur_authn_type == "api" ? data.conjur_secret.aws_secret_key[0].value : null
+  # When using API auth, AWS creds come from Conjur secrets.
+  # When using IAM auth, these are null and the provider uses the EC2 instance profile.
+  access_key = one(data.conjur_secret.aws_access_key[*].value)
+  secret_key = one(data.conjur_secret.aws_secret_key[*].value)
 }
 
 # =====================================================================
