@@ -1,0 +1,17 @@
+# =============================================================================
+# Root-level grants
+# =============================================================================
+# Loaded into branch: root
+#   conjur policy update -b root -f grants.yml
+#
+# Cross-branch grants that connect data hosts to authenticator groups.
+# These must be loaded at root because the authenticator and data branches
+# are siblings.
+# =============================================================================
+
+# -------------------------------------------------------------------------
+# Grant: allow data/murphys-tf to authenticate via authn-iam/default
+# -------------------------------------------------------------------------
+- !grant
+  role: !group conjur/authn-iam/default/apps
+  member: !host data/murphys-tf
