@@ -19,13 +19,11 @@ provider "conjur" {
   account       = var.conjur_account
   authn_type    = var.conjur_authn_type == "iam" ? "aws" : "api"
 
-  # Login is required for both auth modes:
-  #   API mode: the Conjur host login (e.g. host/data/murphys-tf)
-  #   IAM mode: identifies which host is authenticating via authn-iam
-  login   = var.conjur_authn_type == "iam" ? var.conjur_host_id : var.conjur_login
+  # API key auth (laptop)
+  login   = var.conjur_authn_type == "api" ? var.conjur_login : null
   api_key = var.conjur_authn_type == "api" ? var.conjur_api_key : null
 
-  # IAM auth (EC2) — ignored when using API key
+  # IAM auth (EC2) — host_id is the Conjur host path, e.g. host/data/murphys-tf
   service_id = var.conjur_authn_type == "iam" ? var.conjur_service_id : null
   host_id    = var.conjur_authn_type == "iam" ? var.conjur_host_id : null
 }
