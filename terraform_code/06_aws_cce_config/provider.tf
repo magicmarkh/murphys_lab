@@ -18,7 +18,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.4.0"
+      version = "~> 0.2.1"  # pinned by cyberark/cce-organization/aws module (latest v0.2.3 requires ~> 0.2.1)
     }
     conjur = {
       source  = "cyberark/conjur"
