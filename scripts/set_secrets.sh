@@ -146,8 +146,8 @@ main() {
             echo ""
             read -p "Enter conjur_service_id [default]: " conjur_service_id
             conjur_service_id="${conjur_service_id:-default}"
-            read -p "Enter conjur_host_id [host/data/murphys-tf]: " conjur_host_id
-            conjur_host_id="${conjur_host_id:-host/data/murphys-tf}"
+            read -p "Enter conjur_host_id [host/data/your-workload]: " conjur_host_id
+            conjur_host_id="${conjur_host_id:-host/data/your-workload}"
             ;;
         *)
             echo "ERROR: Invalid choice. Please enter 1 or 2."
