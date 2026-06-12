@@ -45,13 +45,13 @@ for dir in "${ALL_DIRS[@]}"; do
 
     # Apply filter if provided
     if [[ -n "$FILTER" ]] && [[ "$dir" != *"$FILTER"* ]]; then
-        ((SKIP++))
+        SKIP=$((SKIP + 1))
         continue
     fi
 
     if [[ ! -d "$full_path" ]]; then
         printf "${COLOR_YELLOW}SKIP${COLOR_RESET}  %s (directory not found)\n" "$dir"
-        ((SKIP++))
+        SKIP=$((SKIP + 1))
         continue
     fi
 
@@ -59,12 +59,12 @@ for dir in "${ALL_DIRS[@]}"; do
 
     if CONJURRC=/dev/null terraform -chdir="$full_path" init -upgrade -input=false > /tmp/tf_init_output_$$ 2>&1; then
         printf "${COLOR_GREEN}OK${COLOR_RESET}\n"
-        ((PASS++))
+        PASS=$((PASS + 1))
     else
         printf "${COLOR_RED}FAILED${COLOR_RESET}\n"
         # Show last 5 lines of error output
         tail -5 /tmp/tf_init_output_$$ | sed 's/^/       /'
-        ((FAIL++))
+        FAIL=$((FAIL + 1))
     fi
 
     rm -f /tmp/tf_init_output_$$
