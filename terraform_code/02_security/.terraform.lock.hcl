@@ -2,16 +2,16 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/cyberark/conjur" {
-  version     = "0.8.1"
+  version     = "0.8.4"
   constraints = "~> 0.8.1"
   hashes = [
-    "h1:lVDD1cLbJc4U3kY7u+mSpmB11B+gjFBtF6L8Rw6X3wo=",
-    "zh:068810329c9e9bdc6e30a3da50b5556e2066a0b016afdb98e02cb5b57b717f82",
-    "zh:0c8a43e8321c8f0e001711c9feaace797cde6d4e67bdb6930f82e398a91121d3",
-    "zh:0e7559b23739ed91f61ebcdb3c0bef70b0f5acddc2d88a4fd4f424ec3f083b2b",
-    "zh:1bb991e53034fb4c5fbfb8cb42c2e51caba93b78ab2812ab79a3e772d0524e8d",
-    "zh:39022d02057633003d1d4b15afcdbf57c753ad2947c956f00e81bae0cd383052",
-    "zh:f04a11cdc152ea217aca6153136067dc4b9b3db1814d2bb4b44ba6c2c99872c2",
+    "h1:65S55TYmcbC2zlagp3Oa6k800gN5QVfr2gogsLMVWgY=",
+    "zh:59292a880e0a23d907c87ca1e08cd21f5f99c72fc9963dc8374e2c0510de4e15",
+    "zh:6a45f02e84a6127e16a342c5288ef0360f2f2ca6a400bdb9617aa17ca2bd60ea",
+    "zh:b7a346bcb315f69d40ce5bbc3521ca1373413adf30b40aedfe1ae5e69deddf59",
+    "zh:ce7f9d060faca431e0c0a06b13abd0a3baa47c50a71f4b084a10d6d0348d4304",
+    "zh:e9e064959ae3742ab3dded31509b23bb0c58ee7abc2c7946a32c49888e9198b4",
+    "zh:ecd318f07e7b10efb6bf9a805ccb09a456bc5025cb3f5cc31a4e9f4bc38ad7e3",
   ]
 }
 

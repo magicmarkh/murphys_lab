@@ -18,7 +18,7 @@ terraform {
     }
     idsec = {
       source  = "cyberark/idsec"
-      version = "~> 0.3.3"
+      version = "~> 0.4.0"
     }
     conjur = {
       source  = "cyberark/conjur"
