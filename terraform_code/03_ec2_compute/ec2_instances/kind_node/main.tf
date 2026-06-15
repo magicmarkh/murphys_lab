@@ -32,6 +32,17 @@ resource "aws_instance" "kind_node" {
   }
 }
 
+# =====================================================================
+# CyberArk SSH Public Key: Add public key to Linux system
+# =====================================================================
+resource "idsec_sia_ssh_public_key" "kind_node_key" {
+  target_machine       = aws_instance.kind_node.private_ip
+  username             = "ec2-user"
+  private_key_contents = var.private_key_contents
+
+  depends_on = [aws_instance.kind_node]
+}
+
 resource "null_resource" "setup_kind" {
   depends_on = [aws_instance.kind_node]
 
