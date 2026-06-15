@@ -9,7 +9,7 @@
 #     playbooks/setup_kind_node.yml
 
 - name: Set up Kind Kubernetes node
-  hosts: kind_nodes
+  hosts: all
   become: no
   gather_facts: yes
 
