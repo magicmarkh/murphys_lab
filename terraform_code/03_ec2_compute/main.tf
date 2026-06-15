@@ -164,3 +164,20 @@ module "targets" {
   windows_ami_id                          = local.windows_ami_id
   ec2_tf_automation_instance_profile_name = data.terraform_remote_state.security.outputs.ec2_tf_automation_instance_profile_name
 }
+
+# =====================================================================
+# KIND KUBERNETES NODE
+# =====================================================================
+module "kind_node" {
+  source                   = "./ec2_instances/kind_node"
+  linux_ami_id             = local.linux_ami_id
+  key_name                 = module.key_pair.key_name
+  team_name                = var.team_name
+  asset_owner_name         = var.asset_owner_name
+  iScheduler               = var.iScheduler
+  linux_security_group_ids = data.terraform_remote_state.foundation.outputs.ssh_internal_flat_sg_id
+  private_subnet_id        = data.terraform_remote_state.foundation.outputs.private_subnet_id
+  kind_node_private_ip     = var.kind_node_private_ip
+  kind_node_hostname       = var.kind_node_hostname
+  private_key_contents     = data.conjur_secret.aws_pem_key.value
+}

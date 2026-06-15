@@ -1,0 +1,17 @@
+---
+# Playbook to configure a Kind Kubernetes node on Amazon Linux 2023
+# Installs Docker, Kind, kubectl, Helm and bootstraps a default cluster
+#
+# Usage:
+#   ansible-playbook -i '<ec2-instance-ip>,' \
+#     -e 'ansible_user=ec2-user' \
+#     --private-key=/path/to/us-ent-east-key.pem \
+#     playbooks/setup_kind_node.yml
+
+- name: Set up Kind Kubernetes node
+  hosts: kind_nodes
+  become: no
+  gather_facts: yes
+
+  roles:
+    - kind_node

@@ -1,0 +1,139 @@
+---
+# Tasks to set up a Kind Kubernetes node on Amazon Linux 2023
+# Installs Docker, Kind, kubectl, and Helm, then creates a default cluster
+
+- name: Update dnf package cache
+  ansible.builtin.dnf:
+    update_cache: yes
+  become: yes
+
+- name: Install Docker
+  ansible.builtin.dnf:
+    name: docker
+    state: present
+  become: yes
+
+- name: Start and enable Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Add ec2-user to docker group
+  ansible.builtin.user:
+    name: ec2-user
+    groups: docker
+    append: yes
+  become: yes
+
+- name: Reset SSH connection to pick up docker group
+  ansible.builtin.meta: reset_connection
+
+- name: Get latest kubectl stable version
+  ansible.builtin.uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: yes
+  register: kubectl_version
+
+- name: Download kubectl binary
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version.content | trim }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  become: yes
+
+- name: Get latest Kind version from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/kubernetes-sigs/kind/releases/latest
+    return_content: yes
+  register: kind_release
+
+- name: Download Kind binary
+  ansible.builtin.get_url:
+    url: "https://kind.sigs.k8s.io/dl/{{ kind_release.json.tag_name }}/kind-linux-amd64"
+    dest: /usr/local/bin/kind
+    mode: '0755'
+  become: yes
+
+- name: Download Helm install script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: '0755'
+
+- name: Install Helm
+  ansible.builtin.command: /tmp/get_helm.sh
+  environment:
+    DESIRED_VERSION: ""
+  become: yes
+
+- name: Remove Helm install script
+  ansible.builtin.file:
+    path: /tmp/get_helm.sh
+    state: absent
+
+- name: Create Kind cluster config
+  ansible.builtin.copy:
+    dest: /home/ec2-user/kind-config.yaml
+    owner: ec2-user
+    group: ec2-user
+    mode: '0644'
+    content: |
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+        - role: control-plane
+          kubeadmConfigPatches:
+            - |
+              kind: InitConfiguration
+              nodeRegistration:
+                kubeletExtraArgs:
+                  node-labels: "ingress-ready=true"
+          extraPortMappings:
+            - containerPort: 80
+              hostPort: 80
+              protocol: TCP
+            - containerPort: 443
+              hostPort: 443
+              protocol: TCP
+
+- name: Create Kind cluster
+  ansible.builtin.command: kind create cluster --config /home/ec2-user/kind-config.yaml
+  args:
+    creates: /home/ec2-user/.kube/config
+
+- name: Verify Docker installation
+  ansible.builtin.command: docker --version
+  register: docker_version
+  changed_when: false
+
+- name: Verify kubectl installation
+  ansible.builtin.command: kubectl version --client
+  register: kubectl_ver
+  changed_when: false
+
+- name: Verify Kind installation
+  ansible.builtin.command: kind version
+  register: kind_ver
+  changed_when: false
+
+- name: Verify Helm installation
+  ansible.builtin.command: helm version --short
+  register: helm_ver
+  changed_when: false
+
+- name: Verify Kind cluster is running
+  ansible.builtin.command: kubectl get nodes
+  register: cluster_nodes
+  changed_when: false
+
+- name: Display installation results
+  ansible.builtin.debug:
+    msg:
+      - "Docker: {{ docker_version.stdout }}"
+      - "kubectl: {{ kubectl_ver.stdout }}"
+      - "Kind: {{ kind_ver.stdout }}"
+      - "Helm: {{ helm_ver.stdout }}"
+      - "Cluster Nodes:"
+      - "{{ cluster_nodes.stdout_lines }}"

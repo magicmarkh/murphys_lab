@@ -256,3 +256,17 @@ variable "domain_name" {
   type        = string
   default     = ""
 }
+
+# ===========================
+# Kind Kubernetes Node
+# ===========================
+variable "kind_node_private_ip" {
+  description = "private ip of the Kind Kubernetes node"
+  type        = string
+}
+
+variable "kind_node_hostname" {
+  description = "Hostname for the Kind Kubernetes node instance"
+  type        = string
+  default     = "us-ent-east-kind-1"
+}
