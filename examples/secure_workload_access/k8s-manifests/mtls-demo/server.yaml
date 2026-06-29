@@ -1,0 +1,103 @@
+---
+# mtls-server: terminates mutual TLS using an X.509-SVID it fetches
+# from the SWA Workload API (socket mounted by the SPIFFE CSI driver).
+# SVIDs are refreshed on a short loop so cert rotation is automatic.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mtls-server
+  namespace: swa-demo
+  labels:
+    app.kubernetes.io/name: mtls-server
+    cyberark.com/demo: x509-svid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mtls-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mtls-server
+    spec:
+      serviceAccountName: mtls-server
+      containers:
+        - name: svid-writer
+          # Sidecar: keeps /var/run/svids fresh by re-fetching the
+          # X.509-SVID every 5 minutes via the Workload API. In real
+          # deployments use spiffe-helper - this loop is intentionally
+          # boring so the demo is easy to read.
+          image: ghcr.io/spiffe/spire-agent:1.10.4
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              mkdir -p /var/run/svids
+              while true; do
+                echo "[svid-writer] fetching X.509-SVID via Workload API"
+                spire-agent api fetch x509 \
+                  -socketPath /spiffe-workload-api/spire-agent.sock \
+                  -write /var/run/svids \
+                || echo "[svid-writer] fetch failed; retrying"
+                sleep 300
+              done
+          volumeMounts:
+            - name: spiffe-workload-api
+              mountPath: /spiffe-workload-api
+              readOnly: true
+            - name: svids
+              mountPath: /var/run/svids
+        - name: listener
+          image: alpine:3.20
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache socat >/dev/null
+              echo "[listener] waiting for SVID files..."
+              while [ ! -s /var/run/svids/svid.0.pem ]; do sleep 2; done
+              echo "[listener] SVID ready; starting mTLS listener on :8443"
+              # Mutual TLS:
+              #  cert/key  - this pod's X.509-SVID
+              #  cafile    - the trust bundle from the same trust domain
+              #  verify=1  - require + validate a client cert
+              exec socat -v \
+                OPENSSL-LISTEN:8443,reuseaddr,fork,\
+              cert=/var/run/svids/svid.0.pem,\
+              key=/var/run/svids/svid.0.key,\
+              cafile=/var/run/svids/bundle.0.pem,\
+              verify=1 \
+                EXEC:'/bin/sh -c "printf \"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhello from mtls-server\r\n\""'
+          ports:
+            - name: mtls
+              containerPort: 8443
+          volumeMounts:
+            - name: svids
+              mountPath: /var/run/svids
+              readOnly: true
+      volumes:
+        - name: spiffe-workload-api
+          csi:
+            # The SPIFFE CSI driver mounts the SWA Agent's Workload API
+            # socket here. The driver does not write any cert files
+            # itself - the svid-writer sidecar fetches them over the
+            # socket and shares them with the listener via the emptyDir.
+            driver: csi.spiffe.io
+            readOnly: true
+        - name: svids
+          emptyDir:
+            medium: Memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mtls-server
+  namespace: swa-demo
+spec:
+  selector:
+    app.kubernetes.io/name: mtls-server
+  ports:
+    - name: mtls
+      port: 8443
+      targetPort: 8443

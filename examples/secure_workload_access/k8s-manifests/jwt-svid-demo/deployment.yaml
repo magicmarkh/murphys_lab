@@ -1,0 +1,89 @@
+---
+# secret-fetcher: a pod that proves it can read a Conjur Cloud secret
+# without any long-lived credentials. Its only identity is the SPIFFE
+# JWT-SVID it requests from the SWA Workload API mounted at
+# /run/spire/agent-sockets/spire-agent.sock.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secret-fetcher
+  namespace: swa-demo
+  labels:
+    app.kubernetes.io/name: secret-fetcher
+    cyberark.com/demo: jwt-svid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: secret-fetcher
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: secret-fetcher
+    spec:
+      serviceAccountName: secret-fetcher
+      containers:
+        - name: fetcher
+          # ghcr.io/spiffe/spire-agent ships the spire-agent CLI which
+          # speaks the standard SPIFFE Workload API exposed by the SWA
+          # Agent. curl is added for the Conjur HTTPS calls.
+          image: ghcr.io/spiffe/spire-agent:1.10.4
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache curl >/dev/null 2>&1 || true
+              while true; do
+                /demo/fetch.sh || echo "[secret-fetcher] attempt failed; retrying in 60s"
+                sleep 60
+              done
+          env:
+            - name: CONJUR_APPLIANCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: secret-fetcher-config
+                  key: conjur_appliance_url
+            - name: CONJUR_ACCOUNT
+              valueFrom:
+                configMapKeyRef:
+                  name: secret-fetcher-config
+                  key: conjur_account
+            - name: CONJUR_AUTHN_JWT_SERVICE_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: secret-fetcher-config
+                  key: conjur_authn_jwt_service_id
+            - name: CONJUR_HOST_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: secret-fetcher-config
+                  key: conjur_host_id
+            - name: SECRET_VARIABLE_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: secret-fetcher-config
+                  key: secret_variable_id
+            - name: JWT_AUDIENCE
+              valueFrom:
+                configMapKeyRef:
+                  name: secret-fetcher-config
+                  key: jwt_audience
+          volumeMounts:
+            - name: workload-api
+              mountPath: /run/spire/agent-sockets
+              readOnly: true
+            - name: demo-script
+              mountPath: /demo
+              readOnly: true
+      volumes:
+        - name: workload-api
+          hostPath:
+            # Same hostPath the SWA Agent publishes its socket at. The
+            # Agent runs as a DaemonSet, so this socket exists on every
+            # node that hosts a workload.
+            path: /run/spire/agent-sockets
+            type: Directory
+        - name: demo-script
+          configMap:
+            name: secret-fetcher-script
+            defaultMode: 0555

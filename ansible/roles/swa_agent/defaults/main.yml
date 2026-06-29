@@ -1,0 +1,36 @@
+---
+# Defaults for the swa_agent role.
+# Override these on the command line with -e or in the playbook vars.
+
+# CyberArk Secrets Manager - SaaS (Idira / Conjur Cloud) subdomain.
+# Example: "mytenant" -> https://mytenant.secretsmgr.cyberark.cloud
+swa_tenant_subdomain: ""
+
+# Trust domain configured in the SWA control plane.
+# Must match what you created in the Secrets Manager - SaaS UI.
+swa_trust_domain: "murphys-lab.local"
+
+# Join token generated in the SWA control plane for this node group.
+# Treat this like a secret. Pass it in with -e or via vault.
+swa_join_token: ""
+
+# Helm chart coordinates for the SWA Agent (a.k.a. SPIRE Agent bundle
+# packaged by CyberArk). Override the version when CyberArk publishes a
+# newer chart.
+swa_helm_repo_name: "cyberark-swa"
+swa_helm_repo_url: "https://cyberark.github.io/secure-workload-access-charts"
+swa_helm_chart: "cyberark-swa/swa-agent"
+swa_helm_chart_version: "1.0.0"
+
+# Kubernetes namespace where the SWA Agent and SPIFFE CSI driver live.
+swa_namespace: "cyberark-swa"
+
+# Whether to install the SPIFFE CSI driver alongside the agent. The
+# CSI driver is what mounts X.509-SVIDs into demo pods as files.
+swa_install_csi_driver: true
+swa_csi_driver_chart: "cyberark-swa/spiffe-csi-driver"
+swa_csi_driver_version: "0.2.6"
+
+# Kubeconfig the install runs against. Defaults to the ec2-user
+# kubeconfig produced by the kind_node role.
+swa_kubeconfig: "/home/ec2-user/.kube/config"

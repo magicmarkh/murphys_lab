@@ -1,0 +1,25 @@
+---
+# Copy this to configmap-conjur.yaml and fill in your values, then
+# kubectl apply it before the deployment. The values must match what
+# you configured in Conjur Cloud (see the README, "Manual steps in
+# CyberArk Secrets Manager - SaaS").
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: secret-fetcher-config
+  namespace: swa-demo
+data:
+  # Your Conjur Cloud tenant URL.
+  conjur_appliance_url: "https://mytenant.secretsmgr.cyberark.cloud/api"
+  # Conjur account is "conjur" for Conjur Cloud tenants.
+  conjur_account: "conjur"
+  # Service ID of the authn-jwt authenticator you created in Conjur.
+  conjur_authn_jwt_service_id: "swa-demo"
+  # Conjur host identity the JWT will map to (without the host/ prefix
+  # the API path adds automatically).
+  conjur_host_id: "host/data/swa-demo/workloads/secret-fetcher"
+  # Fully qualified variable ID the host is permitted to read.
+  secret_variable_id: "data/swa-demo/secrets/demo-api-key"
+  # Audience claim the JWT must carry. Must equal the token-app-property
+  # / audience configured on the authenticator.
+  jwt_audience: "conjur/swa-demo"

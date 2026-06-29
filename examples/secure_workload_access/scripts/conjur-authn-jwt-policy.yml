@@ -1,0 +1,70 @@
+# Conjur Cloud policy to wire up authn-jwt for the SWA demo.
+#
+# Load it from the laptop with the conjur CLI, after you have authenticated:
+#
+#   conjur policy load -f scripts/conjur-authn-jwt-policy.yml -b root
+#
+# Then set the JWT validation variables. signing-key OR jwks-uri must be
+# populated - jwks-uri is the SWA-native option, signing-key is for air-
+# gapped tenants.
+#
+#   conjur variable set -i conjur/authn-jwt/swa-demo/issuer \
+#       -v "https://<your-tenant>.secretsmgr.cyberark.cloud"
+#   conjur variable set -i conjur/authn-jwt/swa-demo/jwks-uri \
+#       -v "https://<your-tenant>.secretsmgr.cyberark.cloud/api/swa/jwks"
+#   conjur variable set -i conjur/authn-jwt/swa-demo/audience \
+#       -v "conjur/swa-demo"
+#   conjur variable set -i conjur/authn-jwt/swa-demo/token-app-property \
+#       -v "sub"
+#   conjur variable set -i conjur/authn-jwt/swa-demo/identity-path \
+#       -v "data/swa-demo/workloads"
+#   conjur variable set -i data/swa-demo/secrets/demo-api-key \
+#       -v "s3cr3t-rotated-by-conjur"
+
+- !policy
+  id: conjur/authn-jwt/swa-demo
+  body:
+    - !webservice
+    - !variable issuer
+    - !variable jwks-uri
+    - !variable audience
+    - !variable token-app-property
+    - !variable identity-path
+
+    - !group authenticatable
+    - !permit
+      role: !group authenticatable
+      privilege: [ read, authenticate ]
+      resource: !webservice
+
+- !policy
+  id: data/swa-demo
+  body:
+    - !policy
+      id: workloads
+      body:
+        # The SPIFFE ID this host represents:
+        # spiffe://murphys-lab.local/ns/swa-demo/sa/secret-fetcher
+        # Because token-app-property=sub, the JWT's sub claim must equal
+        # this host's id when the identity-path prefix is removed.
+        - !host
+          id: ns/swa-demo/sa/secret-fetcher
+          annotations:
+            description: "Demo workload identity for the SWA JWT-SVID flow"
+
+    - !policy
+      id: secrets
+      body:
+        - !variable
+          id: demo-api-key
+          annotations:
+            description: "Rotated secret the workload fetches via its SPIFFE JWT"
+
+    - !permit
+      role: !host workloads/ns/swa-demo/sa/secret-fetcher
+      privilege: [ read, execute ]
+      resource: !variable secrets/demo-api-key
+
+- !grant
+  role: !group conjur/authn-jwt/swa-demo/authenticatable
+  member: !host data/swa-demo/workloads/ns/swa-demo/sa/secret-fetcher

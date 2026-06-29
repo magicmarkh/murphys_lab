@@ -1,0 +1,28 @@
+---
+# Install the CyberArk Secure Workload Access (SWA) Agent on the Kind
+# Kubernetes node that was provisioned by setup_kind_node.yml.
+#
+# Required extra-vars:
+#   swa_tenant_subdomain  - your Secrets Manager - SaaS subdomain
+#   swa_join_token        - join token issued by the SWA control plane
+#
+# Optional extra-vars (override defaults in roles/swa_agent/defaults/main.yml):
+#   swa_trust_domain          (default: murphys-lab.local)
+#   swa_helm_chart_version    (default: 1.0.0)
+#   swa_install_csi_driver    (default: true)
+#
+# Usage:
+#   ansible-playbook -i '<ec2-instance-ip>,' \
+#     -e 'ansible_user=ec2-user' \
+#     -e 'swa_tenant_subdomain=mytenant' \
+#     -e 'swa_join_token=<token-from-swa-ui>' \
+#     --private-key=/path/to/us-ent-east-key.pem \
+#     playbooks/install_swa_agent.yml
+
+- name: Install CyberArk SWA Agent on the Kind cluster
+  hosts: all
+  become: no
+  gather_facts: yes
+
+  roles:
+    - swa_agent

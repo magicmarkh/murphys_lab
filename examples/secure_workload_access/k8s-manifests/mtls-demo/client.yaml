@@ -1,0 +1,77 @@
+---
+# mtls-client: dials mtls-server with its own X.509-SVID. The trust
+# bundle the agent hands us is what makes us trust the server's cert,
+# so neither pod ever talks to a workload outside the trust domain.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mtls-client
+  namespace: swa-demo
+  labels:
+    app.kubernetes.io/name: mtls-client
+    cyberark.com/demo: x509-svid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mtls-client
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mtls-client
+    spec:
+      serviceAccountName: mtls-client
+      containers:
+        - name: svid-writer
+          image: ghcr.io/spiffe/spire-agent:1.10.4
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              mkdir -p /var/run/svids
+              while true; do
+                echo "[svid-writer] fetching X.509-SVID via Workload API"
+                spire-agent api fetch x509 \
+                  -socketPath /spiffe-workload-api/spire-agent.sock \
+                  -write /var/run/svids \
+                || echo "[svid-writer] fetch failed; retrying"
+                sleep 300
+              done
+          volumeMounts:
+            - name: spiffe-workload-api
+              mountPath: /spiffe-workload-api
+              readOnly: true
+            - name: svids
+              mountPath: /var/run/svids
+        - name: dialer
+          image: alpine:3.20
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache curl >/dev/null
+              echo "[dialer] waiting for SVID files..."
+              while [ ! -s /var/run/svids/svid.0.pem ]; do sleep 2; done
+              while true; do
+                echo "[dialer] dialing https://mtls-server.swa-demo.svc:8443"
+                curl --silent --show-error --max-time 10 \
+                  --cacert  /var/run/svids/bundle.0.pem \
+                  --cert    /var/run/svids/svid.0.pem \
+                  --key     /var/run/svids/svid.0.key \
+                  "https://mtls-server.swa-demo.svc:8443/" \
+                || echo "[dialer] handshake failed (expected briefly on first boot)"
+                sleep 30
+              done
+          volumeMounts:
+            - name: svids
+              mountPath: /var/run/svids
+              readOnly: true
+      volumes:
+        - name: spiffe-workload-api
+          csi:
+            driver: csi.spiffe.io
+            readOnly: true
+        - name: svids
+          emptyDir:
+            medium: Memory

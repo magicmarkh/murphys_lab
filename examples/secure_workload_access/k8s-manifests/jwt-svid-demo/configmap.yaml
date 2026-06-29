@@ -1,0 +1,57 @@
+---
+# Demo script the secret-fetcher pod runs on a loop. It uses the SPIRE
+# Workload API to fetch a JWT-SVID, presents that JWT to Conjur Cloud's
+# authn-jwt service, and uses the returned access token to read a secret.
+#
+# No long-lived API key lives on disk or in env vars - the JWT is
+# cryptographically bound to the pod's workload identity and expires in
+# minutes.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: secret-fetcher-script
+  namespace: swa-demo
+data:
+  fetch.sh: |
+    #!/usr/bin/env sh
+    set -eu
+
+    : "${CONJUR_APPLIANCE_URL:?must be set}"
+    : "${CONJUR_ACCOUNT:?must be set}"
+    : "${CONJUR_AUTHN_JWT_SERVICE_ID:?must be set}"
+    : "${CONJUR_HOST_ID:?must be set}"
+    : "${SECRET_VARIABLE_ID:?must be set}"
+    : "${JWT_AUDIENCE:?must be set}"
+
+    SOCKET="unix:///run/spire/agent-sockets/spire-agent.sock"
+
+    echo "[secret-fetcher] requesting JWT-SVID from the SWA Workload API"
+    JWT="$(spire-agent api fetch jwt \
+      -socketPath /run/spire/agent-sockets/spire-agent.sock \
+      -audience "${JWT_AUDIENCE}" \
+      | awk '/token\(.*\):/{getline; print; exit}' \
+      | tr -d '[:space:]')"
+
+    if [ -z "${JWT}" ]; then
+      echo "[secret-fetcher] FAILED to obtain JWT-SVID"
+      exit 1
+    fi
+
+    echo "[secret-fetcher] exchanging JWT-SVID for a Conjur access token"
+    ENC_HOST="$(printf '%s' "${CONJUR_HOST_ID}" | sed 's:/:%2F:g')"
+    AUTHN_URL="${CONJUR_APPLIANCE_URL}/authn-jwt/${CONJUR_AUTHN_JWT_SERVICE_ID}/${CONJUR_ACCOUNT}/${ENC_HOST}/authenticate"
+
+    ACCESS_TOKEN="$(curl -sS -f \
+      -H 'Content-Type: application/x-www-form-urlencoded' \
+      -H 'Accept-Encoding: base64' \
+      --data-urlencode "jwt=${JWT}" \
+      "${AUTHN_URL}")"
+
+    echo "[secret-fetcher] reading secret ${SECRET_VARIABLE_ID}"
+    ENC_VAR="$(printf '%s' "${SECRET_VARIABLE_ID}" | sed 's:/:%2F:g')"
+    SECRET="$(curl -sS -f \
+      -H "Authorization: Token token=\"${ACCESS_TOKEN}\"" \
+      "${CONJUR_APPLIANCE_URL}/secrets/${CONJUR_ACCOUNT}/variable/${ENC_VAR}")"
+
+    echo "[secret-fetcher] retrieved secret value (length=${#SECRET})"
+    echo "[secret-fetcher] first 4 chars: $(printf '%s' "${SECRET}" | cut -c1-4)********"

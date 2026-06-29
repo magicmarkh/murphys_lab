@@ -1,0 +1,100 @@
+---
+# Install the CyberArk Secure Workload Access (SWA) Agent on the existing
+# Kind cluster. Assumes the kind_node role already ran on this host.
+
+- name: Verify required variables are set
+  ansible.builtin.assert:
+    that:
+      - swa_tenant_subdomain | length > 0
+      - swa_join_token | length > 0
+    fail_msg: >-
+      swa_tenant_subdomain and swa_join_token must be provided. Generate the
+      join token in the SWA control plane (Secrets Manager - SaaS UI) and
+      pass it in with -e swa_join_token=...
+
+- name: Ensure kubectl can reach the cluster
+  ansible.builtin.command: kubectl get nodes
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  changed_when: false
+
+- name: Add the CyberArk SWA Helm repository
+  ansible.builtin.command:
+    cmd: "helm repo add {{ swa_helm_repo_name }} {{ swa_helm_repo_url }}"
+  register: helm_repo_add
+  changed_when: "'has been added' in helm_repo_add.stdout"
+  failed_when:
+    - helm_repo_add.rc != 0
+    - "'already exists' not in helm_repo_add.stderr"
+
+- name: Refresh Helm repositories
+  ansible.builtin.command: helm repo update
+  changed_when: false
+
+- name: Create the SWA namespace
+  ansible.builtin.command: >-
+    kubectl create namespace {{ swa_namespace }}
+    --dry-run=client -o yaml
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  register: ns_manifest
+  changed_when: false
+
+- name: Apply the SWA namespace
+  ansible.builtin.shell: "echo '{{ ns_manifest.stdout }}' | kubectl apply -f -"
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  changed_when: true
+
+- name: Render the SWA Agent Helm values
+  ansible.builtin.template:
+    src: swa-agent-values.yaml.j2
+    dest: /home/ec2-user/swa-agent-values.yaml
+    owner: ec2-user
+    group: ec2-user
+    mode: '0600'
+
+- name: Install or upgrade the SWA Agent
+  ansible.builtin.command:
+    cmd: >-
+      helm upgrade --install swa-agent {{ swa_helm_chart }}
+      --version {{ swa_helm_chart_version }}
+      --namespace {{ swa_namespace }}
+      --values /home/ec2-user/swa-agent-values.yaml
+      --wait --timeout 5m
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  register: swa_install
+  changed_when: "'has been upgraded' in swa_install.stdout or 'has been installed' in swa_install.stdout"
+
+- name: Install or upgrade the SPIFFE CSI driver
+  ansible.builtin.command:
+    cmd: >-
+      helm upgrade --install spiffe-csi-driver {{ swa_csi_driver_chart }}
+      --version {{ swa_csi_driver_version }}
+      --namespace {{ swa_namespace }}
+      --set "agentSocketPath=/run/spire/agent-sockets/spire-agent.sock"
+      --wait --timeout 5m
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  when: swa_install_csi_driver | bool
+  register: csi_install
+  changed_when: "'has been upgraded' in csi_install.stdout or 'has been installed' in csi_install.stdout"
+
+- name: Wait for the SWA Agent DaemonSet to be ready
+  ansible.builtin.command: >-
+    kubectl -n {{ swa_namespace }} rollout status daemonset/swa-agent --timeout=180s
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  changed_when: false
+
+- name: Show the running SWA pods
+  ansible.builtin.command: kubectl -n {{ swa_namespace }} get pods -o wide
+  environment:
+    KUBECONFIG: "{{ swa_kubeconfig }}"
+  register: swa_pods
+  changed_when: false
+
+- name: Display the SWA pods
+  ansible.builtin.debug:
+    msg: "{{ swa_pods.stdout_lines }}"

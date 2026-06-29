@@ -1,0 +1,43 @@
+---
+# Helm values for the CyberArk SWA Agent. Rendered by the swa_agent role.
+# See https://docs.cyberark.com/secrets-manager-saas/ for the full schema.
+
+global:
+  # Tenant in Secrets Manager - SaaS that owns this trust domain.
+  tenantSubdomain: "{{ swa_tenant_subdomain }}"
+  trustDomain: "{{ swa_trust_domain }}"
+
+agent:
+  # Join token issued by the SWA control plane for this node group.
+  # Rotated by re-deploying the chart with a fresh token.
+  joinToken: "{{ swa_join_token }}"
+
+  # Node attestor: PSAT lets the control plane verify each node by its
+  # projected service account token rather than a long-lived secret.
+  nodeAttestor:
+    k8sPsat:
+      enabled: true
+      clusterName: "kind"
+
+  # Expose the Workload API as a hostPath socket so demo pods can mount it.
+  workloadApi:
+    socketPath: /run/spire/agent-sockets/spire-agent.sock
+    hostPath: /run/spire/agent-sockets
+
+  # Resource footprint kept small for a single-node Kind cluster.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Lock the agent to the single Kind control-plane node.
+nodeSelector:
+  kubernetes.io/os: linux
+
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
