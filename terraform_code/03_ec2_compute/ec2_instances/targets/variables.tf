@@ -35,7 +35,7 @@ variable "linux_instance_type" {
 variable "windows_instance_type" {
   description = "instance type to be deployed"
   type        = string
-  default     = "t3a.medium"
+  default     = "t3a.large"
 }
 variable "key_name" {
   description = "The name of the AWS key pair to use for the instance"
