@@ -1,7 +1,7 @@
 ---
 - name: Remove Windows Computer from Domain
   hosts: all
-  gather_facts: no
+  gather_facts: false
   connection: winrm
   vars:
     ansible_port: 5985
@@ -45,7 +45,7 @@
         state: workgroup
       register: domain_unjoin
       # Continue even if this fails - AD object is already deleted
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Display unjoin result
       debug:
