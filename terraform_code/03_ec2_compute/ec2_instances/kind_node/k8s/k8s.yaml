@@ -6,6 +6,16 @@
 # may recreate the socket inode on restart, and a directory mount survives that
 # whereas a single-file mount would go stale.
 #
+# CONFIRMED against this KinD deployment (swa-system namespace, swa-agent
+# DaemonSet): the agent's real hostPath is /tmp/swa-agent, and it writes its
+# Workload API socket to a "public" subdirectory:
+#     /tmp/swa-agent/public/api.sock
+# (verified via `docker exec <kind-node> ls -la /tmp/swa-agent/public`).
+# The original /run/swa-agent path in this file was wrong for this
+# environment and was the direct cause of the probe's CrashLoopBackOff
+# ("timed out after 30s waiting for /run/swa-agent/api.sock") — that
+# directory exists on the node but is empty; the agent never wrote there.
+#
 # The ServiceAccount matters for real deployments: SWA workload attestation on
 # Kubernetes keys off namespace + service account, so the SPIFFE ID your
 # workload receives looks like:
@@ -50,21 +60,20 @@ spec:
           type: RuntimeDefault
       containers:
         - name: swa-probe
-          image: your-registry.example.com/swa-probe:0.1.0   # <-- replace
+          image: swa-probe:0.1.0   # <-- kind load docker-image swa-probe:0.1.0
           imagePullPolicy: IfNotPresent
           env:
             - name: SWA_SOCKET_PATH
-              value: /run/swa-agent/api.sock
+              value: /tmp/swa-agent/public/api.sock
             - name: SWA_AUDIENCE
               value: conjur
-            - name: SWA_METHOD
-              value: http            # http | cli | auto
-            - name: SWA_HTTP_PATH
-              value: /svid/jwt       # agent-specific; adjust to your API
             - name: SWA_WAIT_TIMEOUT
               value: 30s
             - name: SWA_PRINT_TOKEN
               value: "false"         # keep tokens out of logs; flip to debug only
+            # SWA_METHOD / SWA_HTTP_PATH / SWA_AGENT_BIN are gone: the probe
+            # now speaks the real SPIFFE Workload API (gRPC-over-UDS) via
+            # go-spiffe, which is what this agent actually exposes.
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -79,32 +88,22 @@ spec:
               memory: 64Mi
           volumeMounts:
             - name: swa-agent-socket
-              mountPath: /run/swa-agent
+              mountPath: /tmp/swa-agent
               readOnly: true          # probe only connects; it never writes here
-            # --- Optional: only if you use SWA_METHOD=cli and want to run the
-            #     node's swa-agent binary instead of baking it into the image ---
-            # - name: swa-agent-bin
-            #   mountPath: /opt/swa/bin
-            #   readOnly: true
       volumes:
         - name: swa-agent-socket
           hostPath:
-            path: /run/swa-agent      # directory that holds api.sock on the node
+            path: /tmp/swa-agent      # directory that holds public/api.sock on the node
             type: Directory           # must already exist (created by the agent)
-        # - name: swa-agent-bin
-        #   hostPath:
-        #     path: /opt/swa/bin
-        #     type: Directory
 #
 # ---------------------------------------------------------------------------
 # GOTCHA — socket permissions:
-# The Workload API socket is intentionally unauthenticated and relies on the
-# agent kernel-attesting the calling process, so agents usually make the socket
-# accessible to all local processes. If you hit "connect: permission denied"
-# while running as nonroot, check the socket's mode/ownership on the node. As a
-# temporary test you can drop runAsNonRoot / run as the socket owner, but the
-# right fix is to configure the agent's socket permissions (or fsGroup) so your
-# workload's UID/GID can connect. Don't ship a privileged probe to prod.
+# Confirmed on this cluster: the socket is world read/write
+# (srw-rw-rw-, owned by uid/gid 65532), so the nonroot probe pod (also uid
+# 65532, though that's coincidental — any uid can connect) should not hit a
+# permission error. If you deploy against a different SWA Agent build and see
+# "connect: permission denied", check the socket's mode/ownership on that
+# node.
 #
 # NOTE: hostPath couples the pod to a node that runs the agent. If the agent is
 # a DaemonSet, every node has it. On clusters that restrict hostPath via Pod

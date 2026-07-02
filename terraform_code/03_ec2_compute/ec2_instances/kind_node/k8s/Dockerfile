@@ -4,8 +4,12 @@
 FROM golang:1.22-alpine AS build
 WORKDIR /src
 
-# Cache modules first (this app is stdlib-only, so this is just go.mod).
-COPY go.mod ./
+# Cache modules first. This app now depends on github.com/spiffe/go-spiffe/v2
+# (real SPIFFE Workload API client, gRPC-over-UDS) instead of the earlier
+# dependency-free HTTP/CLI guesswork, so go.sum is required — generate it
+# once with `go mod tidy` in an environment with normal network access
+# (proxy.golang.org reachable), then commit both go.mod and go.sum.
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
@@ -26,8 +30,8 @@ COPY --from=build /out/swa-probe /usr/local/bin/swa-probe
 # Runs as uid:gid 65532:65532 (nonroot) by default from the base image.
 ENTRYPOINT ["/usr/local/bin/swa-probe"]
 
-# NOTE: This image uses the HTTP-over-UDS method (SWA_METHOD=http|auto), which
-# needs NO extra binary in the container. If you instead want SWA_METHOD=cli,
-# the swa-agent binary must exist in the container at $SWA_AGENT_BIN — either
-# hostPath-mount it from the node (see k8s.yaml) or COPY it into this stage.
-# distroless has no shell, so `cli` still works via direct exec (no shell needed).
+# NOTE: This probe now talks the real SPIFFE Workload API (gRPC-over-UDS) via
+# go-spiffe, matching what this environment's SWA Agent (SPIRE-based) actually
+# exposes. No vendor CLI binary or hostPath binary mount is needed anymore —
+# SWA_AGENT_BIN / SWA_METHOD / SWA_HTTP_PATH env vars from earlier revisions
+# are gone; see README for the current SWA_SOCKET_PATH / SWA_AUDIENCE vars.
