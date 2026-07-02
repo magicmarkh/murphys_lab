@@ -1,0 +1,113 @@
+# =============================================================================
+# SWA connectivity probe — Namespace + ServiceAccount + Deployment
+#
+# The pod mounts the node's SWA Agent socket DIRECTORY (not the socket file)
+# via hostPath. Mounting the directory is the recommended pattern: the agent
+# may recreate the socket inode on restart, and a directory mount survives that
+# whereas a single-file mount would go stale.
+#
+# The ServiceAccount matters for real deployments: SWA workload attestation on
+# Kubernetes keys off namespace + service account, so the SPIFFE ID your
+# workload receives looks like:
+#   spiffe://<trust-domain>/k8s-nodegroup/ns/swa-probe/sa/swa-probe
+# Register that SPIFFE ID (as the JWT `sub`) with your Conjur JWT authenticator.
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: swa-probe
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: swa-probe
+  namespace: swa-probe
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swa-probe
+  namespace: swa-probe
+  labels:
+    app: swa-probe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swa-probe
+  template:
+    metadata:
+      labels:
+        app: swa-probe
+    spec:
+      serviceAccountName: swa-probe
+      # Pod-level hardening.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: swa-probe
+          image: your-registry.example.com/swa-probe:0.1.0   # <-- replace
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SWA_SOCKET_PATH
+              value: /run/swa-agent/api.sock
+            - name: SWA_AUDIENCE
+              value: conjur
+            - name: SWA_METHOD
+              value: http            # http | cli | auto
+            - name: SWA_HTTP_PATH
+              value: /svid/jwt       # agent-specific; adjust to your API
+            - name: SWA_WAIT_TIMEOUT
+              value: 30s
+            - name: SWA_PRINT_TOKEN
+              value: "false"         # keep tokens out of logs; flip to debug only
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          volumeMounts:
+            - name: swa-agent-socket
+              mountPath: /run/swa-agent
+              readOnly: true          # probe only connects; it never writes here
+            # --- Optional: only if you use SWA_METHOD=cli and want to run the
+            #     node's swa-agent binary instead of baking it into the image ---
+            # - name: swa-agent-bin
+            #   mountPath: /opt/swa/bin
+            #   readOnly: true
+      volumes:
+        - name: swa-agent-socket
+          hostPath:
+            path: /run/swa-agent      # directory that holds api.sock on the node
+            type: Directory           # must already exist (created by the agent)
+        # - name: swa-agent-bin
+        #   hostPath:
+        #     path: /opt/swa/bin
+        #     type: Directory
+#
+# ---------------------------------------------------------------------------
+# GOTCHA — socket permissions:
+# The Workload API socket is intentionally unauthenticated and relies on the
+# agent kernel-attesting the calling process, so agents usually make the socket
+# accessible to all local processes. If you hit "connect: permission denied"
+# while running as nonroot, check the socket's mode/ownership on the node. As a
+# temporary test you can drop runAsNonRoot / run as the socket owner, but the
+# right fix is to configure the agent's socket permissions (or fsGroup) so your
+# workload's UID/GID can connect. Don't ship a privileged probe to prod.
+#
+# NOTE: hostPath couples the pod to a node that runs the agent. If the agent is
+# a DaemonSet, every node has it. On clusters that restrict hostPath via Pod
+# Security Admission, run this in a namespace that permits the "privileged" or a
+# suitably relaxed "baseline" policy, or use the agent's CSI driver if provided.
+# ---------------------------------------------------------------------------
